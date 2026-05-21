@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Aiza AI — O sistema que pensa pela sua loja</title>
+<meta name="description" content="Sistema de gestão com IA para lojistas brasileiros. PDV, estoque, financeiro e IA que age pela sua loja. 14 dias grátis."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --indigo:      #6366f1;
+  --indigo-l:    #818cf8;
+  --violet:      #8b5cf6;
+  --cyan:        #06b6d4;
+  --cyan-l:      #22d3ee;
+  --green:       #22c55e;
+  --green-l:     #4ade80;
+  --red:         #ef4444;
+  --orange:      #f97316;
+  --amber:       #f59e0b;
+
+  --bg:          #03040e;
+  --bg2:         #060911;
+  --bg3:         #080c18;
+  --surface:     rgba(10, 12, 32, 0.75);
+  --surface-b:   rgba(99,102,241,0.12);
+  --surface-b2:  rgba(99,102,241,0.22);
+
+  --text:        #f1f5f9;
+  --text2:       #94a3b8;
+  --text3:       #475569;
+  --border:      rgba(255,255,255,0.07);
+  --border-i:    rgba(99,102,241,0.2);
+
+  --font-h:      'Syne', sans-serif;
+  --font-b:      'DM Sans', sans-serif;
+
+  --r:           12px;
+  --r-lg:        20px;
+  --r-xl:        28px;
+
+  --glow-i:   0 0 24px rgba(99,102,241,0.35), 0 0 60px rgba(99,102,241,0.12);
+  --glow-c:   0 0 24px rgba(6,182,212,0.35),  0 0 60px rgba(6,182,212,0.12);
+  --glow-g:   0 0 24px rgba(34,197,94,0.35),  0 0 60px rgba(34,197,94,0.12);
+}
+
+/* ═══════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-b);
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--indigo); border-radius: 3px; }
+
+/* ═══════════════════════════════════════════════
+   CANVAS + GRID
+═══════════════════════════════════════════════ */
+#cvs {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: 0.5;
+}
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px);
+  background-size: 52px 52px;
+  -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 20%, transparent 75%);
+}
+.wrap { position: relative; z-index: 1; }
+
+/* ═══════════════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════════════ */
+.sec { padding: 96px clamp(20px,5vw,72px); max-width: 1080px; margin: 0 auto; }
+.sec-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .14em; color: var(--indigo-l); margin-bottom: 14px;
+}
+.sec-label::before {
+  content:''; display:block; width:18px; height:1px; background:var(--indigo-l);
+}
+.sec-titulo {
+  font-family: var(--font-h);
+  font-size: clamp(26px, 3.5vw, 46px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.08;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+.sec-sub {
+  font-size: 16px; color: var(--text2); line-height: 1.7;
+  font-weight: 300; max-width: 580px;
+}
+.g-text {
+  background: linear-gradient(135deg, var(--indigo-l), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.g-text-vio {
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.dark-sec {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.dark-sec::before {
+  content:''; position:absolute;
+  top:-200px; left:50%; transform:translateX(-50%);
+  width:700px; height:400px;
+  background: radial-gradient(ellipse, rgba(99,102,241,0.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+/* ═══════════════════════════════════════════════
+   GLASSMORPHISM CARD BASE
+═══════════════════════════════════════════════ */
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+.glass-i { border-color: var(--surface-b); }
+.glass:hover { border-color: var(--surface-b2); }
+
+/* ═══════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 100px 32px 80px;
+  position: relative; overflow: hidden;
+}
+.hero-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(90px); pointer-events: none;
+}
+.hero-orb-1 {
+  width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(99,102,241,0.28) 0%, transparent 70%);
+  top: -120px; right: -100px;
+  animation: orb 16s ease-in-out infinite alternate;
+}
+.hero-orb-2 {
+  width: 440px; height: 440px;
+  background: radial-gradient(circle, rgba(6,182,212,0.18) 0%, transparent 70%);
+  bottom: -60px; left: -80px;
+  animation: orb 20s ease-in-out infinite alternate-reverse;
+}
+.hero-orb-3 {
+  width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%);
+  top: 40%; left: 55%;
+  animation: orb 24s ease-in-out infinite alternate;
+}
+@keyframes orb {
+  0%   { transform: translate(0,0) scale(1); }
+  50%  { transform: translate(24px,-18px) scale(1.06); }
+  100% { transform: translate(-16px,24px) scale(0.96); }
+}
+
+/* Logo */
+.hero-logo {
+  display: flex; align-items: center; gap: 16px;
+  justify-content: center; margin-bottom: 56px;
+  position: relative;
+}
+.logo-mark {
+  position: relative;
+  filter: drop-shadow(0 0 20px rgba(99,102,241,0.6));
+}
+.logo-text h1 {
+  font-family: var(--font-h);
+  font-size: 32px; font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #f1f5f9 60%, var(--indigo-l));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.logo-text span {
+  display: block; font-size: 10.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: var(--indigo-l); margin-top: 1px;
+}
+
+/* Badge */
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 8px 20px; border-radius: 999px;
+  border: 1px solid rgba(99,102,241,0.3);
+  background: rgba(99,102,241,0.08);
+  font-size: 12.5px; color: var(--indigo-l); font-weight: 600;
+  margin-bottom: 32px;
+  animation: fade-up 0.7s ease both;
+}
+.badge-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--indigo);
+  box-shadow: 0 0 8px var(--indigo);
+  animation: badge-pulse 1.8s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.5; transform:scale(0.75); }
+}
+
+/* Headline */
+.hero-h2 {
+  font-family: var(--font-h);
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 800;
+  letter-spacing: -3px;
+  line-height: 1.03;
+  margin-bottom: 28px;
+  animation: fade-up 0.7s 0.1s ease both;
+}
+.hero-h2 .white { color: var(--text); }
+.hero-h2 .grad {
+  background: linear-gradient(135deg, var(--indigo-l) 0%, var(--cyan) 60%, var(--violet) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% auto;
+  animation: grad-move 5s ease infinite, fade-up 0.7s 0.15s ease both;
+}
+@keyframes grad-move {
+  0%,100% { background-position: 0% center; }
+  50%      { background-position: 100% center; }
+}
+.hero-sub {
+  font-size: clamp(16px, 2vw, 19px);
+  color: var(--text2); font-weight: 300;
+  max-width: 640px; margin: 0 auto 52px;
+  line-height: 1.7;
+  animation: fade-up 0.7s 0.2s ease both;
+}
+
+/* Badges strip */
+.hero-chips {
+  display: flex; gap: 10px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 52px;
+  animation: fade-up 0.7s 0.25s ease both;
+}
+.chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  font-size: 12.5px; color: var(--text2); font-weight: 500;
+  transition: all 0.2s;
+}
+.chip:hover { border-color: var(--border-i); color: var(--text); }
+.chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* Stats */
+.hero-stats {
+  display: flex; gap: 48px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 64px;
+  animation: fade-up 0.7s 0.3s ease both;
+}
+.hstat { text-align: center; }
+.hstat-val {
+  font-family: var(--font-h);
+  font-size: 30px; font-weight: 800;
+  background: linear-gradient(135deg, var(--text) 0%, var(--indigo-l) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+}
+.hstat-lbl { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+/* CTA buttons */
+.hero-cta {
+  display: flex; gap: 14px; justify-content: center;
+  flex-wrap: wrap;
+  animation: fade-up 0.7s 0.35s ease both;
+}
+.btn-main {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 15px 32px;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  color: #fff; font-size: 15px; font-weight: 700;
+  border: none; border-radius: var(--r); cursor: pointer;
+  font-family: var(--font-b);
+  transition: all 0.25s;
+  box-shadow: 0 8px 32px rgba(99,102,241,0.35);
+  position: relative; overflow: hidden;
+}
+.btn-main::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.4s;
+}
+.btn-main:hover::before { transform: translateX(100%); }
+.btn-main:hover { transform: translateY(-2px); box-shadow: var(--glow-i); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 14px 28px;
+  background: transparent; color: var(--text2);
+  font-size: 15px; font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--r); cursor: pointer;
+  font-family: var(--font-b);
+  transition: all 0.25s;
+}
+.btn-ghost:hover { border-color: var(--border-i); color: var(--text); }
+
+/* ═══════════════════════════════════════════════
+   DOR SECTION
+═══════════════════════════════════════════════ */
+.dor-intro {
+  display: flex; gap: 22px; align-items: flex-start;
+  padding: 30px 34px;
+  background: rgba(239,68,68,0.05);
+  border: 1px solid rgba(239,68,68,0.14);
+  border-radius: var(--r-lg);
+  margin: 44px 0 32px;
+  position: relative; overflow: hidden;
+}
+.dor-intro::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(239,68,68,0.5), transparent);
+}
+.dor-intro-ico { font-size: 40px; flex-shrink: 0; }
+.dor-intro h3 {
+  font-family: var(--font-h); font-size: 20px; font-weight: 700;
+  color: #fca5a5; margin-bottom: 9px;
+}
+.dor-intro p { font-size: 14px; color: var(--text2); line-height: 1.75; }
+
+.dores-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.dor-card {
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(16px);
+  position: relative; overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+}
+.dor-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, transparent, rgba(239,68,68,0.45), transparent);
+}
+.dor-card:hover { border-color: rgba(239,68,68,0.2); transform: translateY(-3px); }
+.dor-emoji { font-size: 36px; margin-bottom: 16px; display: block; }
+.dor-titulo {
+  font-family: var(--font-h); font-size: 15.5px; font-weight: 700;
+  color: var(--text); margin-bottom: 10px; line-height: 1.4;
+}
+.dor-texto { font-size: 13px; color: var(--text2); line-height: 1.75; }
+.dor-quote {
+  margin-top: 14px; padding: 10px 14px;
+  background: rgba(239,68,68,0.06);
+  border-radius: var(--r);
+  border-left: 2px solid rgba(239,68,68,0.3);
+  font-size: 12.5px; color: #fca5a5; font-style: italic; line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════
+   MERCADO DOR
+═══════════════════════════════════════════════ */
+.mercado-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 44px;
+}
+.mercado-card {
+  padding: 30px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(16px);
+  position: relative; overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+}
+.mercado-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, transparent, rgba(249,115,22,0.5), transparent);
+}
+.mercado-card:hover { border-color: rgba(249,115,22,0.18); transform: translateY(-3px); }
+.mercado-tag {
+  display: inline-block;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--orange);
+  background: rgba(249,115,22,0.1);
+  border: 1px solid rgba(249,115,22,0.2);
+  padding: 3px 11px; border-radius: 999px; margin-bottom: 14px;
+}
+.mercado-val {
+  font-family: var(--font-h); font-size: 38px; font-weight: 800;
+  color: var(--red); margin-bottom: 10px; line-height: 1;
+}
+.mercado-titulo {
+  font-family: var(--font-h); font-size: 16px; font-weight: 700;
+  color: var(--text); margin-bottom: 9px; line-height: 1.4;
+}
+.mercado-desc { font-size: 13px; color: var(--text2); line-height: 1.75; }
+.mercado-sol {
+  margin-top: 16px; padding: 10px 14px;
+  background: rgba(34,197,94,0.06);
+  border: 1px solid rgba(34,197,94,0.14);
+  border-radius: var(--r);
+  font-size: 12px; color: var(--green-l); line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════════
+   IA SECTION
+═══════════════════════════════════════════════ */
+.ia-hero-card {
+  display: flex; gap: 32px; align-items: center;
+  padding: 38px 40px;
+  background: rgba(99,102,241,0.06);
+  border: 1px solid rgba(99,102,241,0.18);
+  border-radius: var(--r-xl);
+  margin: 44px 0 32px;
+  position: relative; overflow: hidden;
+}
+.ia-hero-card::before {
+  content:''; position:absolute;
+  top:-80px; right:-80px;
+  width:240px; height:240px;
+  background: radial-gradient(circle, rgba(99,102,241,0.14), transparent 70%);
+  border-radius:50%; pointer-events:none;
+}
+.ia-hero-ico { font-size: 68px; flex-shrink: 0; }
+.ia-hero-card h3 {
+  font-family: var(--font-h); font-size: 22px; font-weight: 800;
+  color: var(--text); margin-bottom: 13px; line-height: 1.25;
+}
+.ia-hero-card p { font-size: 14px; color: var(--text2); line-height: 1.8; }
+.ia-badge {
+  display: inline-block; margin-top: 16px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(139,92,246,0.12));
+  border: 1px solid rgba(99,102,241,0.3);
+  border-radius: var(--r);
+  font-size: 12.5px; color: var(--indigo-l); font-weight: 600;
+}
+
+.ia-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+}
+.ia-card {
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(16px);
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  position: relative; overflow: hidden;
+}
+.ia-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);
+}
+.ia-card:hover {
+  border-color: var(--surface-b2); transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 20px rgba(99,102,241,0.07);
+}
+.ia-ico { font-size: 26px; margin-bottom: 12px; }
+.ia-titulo {
+  font-family: var(--font-h); font-size: 14px; font-weight: 700;
+  color: var(--text); margin-bottom: 7px;
+}
+.ia-desc { font-size: 12.5px; color: var(--text2); line-height: 1.65; }
+.ia-ex {
+  margin-top: 12px; padding: 9px 12px;
+  background: rgba(99,102,241,0.08);
+  border-radius: 8px;
+  font-size: 11px; color: var(--indigo-l); font-style: italic; line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════════
+   SUPORTE
+═══════════════════════════════════════════════ */
+.sup-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 44px;
+}
+.sup-card {
+  padding: 30px;
+  border-radius: var(--r-xl);
+  backdrop-filter: blur(16px);
+}
+.sup-card.deles {
+  background: rgba(239,68,68,0.04);
+  border: 1px solid rgba(239,68,68,0.14);
+}
+.sup-card.nosso {
+  background: rgba(34,197,94,0.04);
+  border: 1px solid rgba(34,197,94,0.14);
+}
+.sup-tag {
+  display: inline-block;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; padding: 4px 13px; border-radius: 999px;
+  margin-bottom: 16px;
+}
+.sup-tag.r { background: rgba(239,68,68,0.14); color: var(--red); }
+.sup-tag.g { background: rgba(34,197,94,0.14); color: var(--green); }
+.sup-card h3 {
+  font-family: var(--font-h); font-size: 18px; font-weight: 700;
+  color: var(--text); margin-bottom: 16px;
+}
+.sup-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-bottom: 10px; font-size: 13px; color: var(--text2);
+}
+.ix { color: var(--red); font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.ig { color: var(--green); font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+/* Passos */
+.passos-wrap { margin-top: 44px; text-align: center; }
+.passos-wrap h3 {
+  font-family: var(--font-h); font-size: 18px; font-weight: 700;
+  color: var(--text); margin-bottom: 20px;
+}
+.passos {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  align-items: center; justify-content: center;
+}
+.passo {
+  padding: 10px 18px;
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 10px;
+  font-size: 12.5px; color: #c7d2fe; font-weight: 600;
+}
+.passo-arr { color: var(--text3); font-size: 18px; }
+.passo-final {
+  padding: 10px 18px;
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 10px;
+  font-size: 12.5px; color: #86efac; font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════
+   FEATURES
+═══════════════════════════════════════════════ */
+.feat-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 15px;
+  margin-top: 44px;
+}
+.feat-card {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(16px);
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  position: relative; overflow: hidden;
+}
+.feat-card::after {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(135deg, transparent 60%, rgba(99,102,241,0.04));
+  opacity:0; transition: opacity 0.3s;
+}
+.feat-card:hover { transform: translateY(-5px); border-color: var(--surface-b2); }
+.feat-card:hover::after { opacity:1; }
+.feat-ico {
+  width: 48px; height: 48px;
+  border-radius: 13px;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 15px;
+  transition: box-shadow 0.3s;
+}
+.feat-card:hover .feat-ico { box-shadow: 0 0 16px rgba(99,102,241,0.25); }
+.feat-titulo {
+  font-family: var(--font-h); font-size: 15px; font-weight: 700;
+  color: var(--text); margin-bottom: 7px;
+}
+.feat-desc { font-size: 12.5px; color: var(--text2); line-height: 1.65; }
+.feat-excl {
+  display: inline-block; margin-top: 10px;
+  font-size: 10.5px; padding: 2px 10px; border-radius: 999px;
+  background: rgba(34,197,94,0.1); color: var(--green);
+  font-weight: 600; border: 1px solid rgba(34,197,94,0.18);
+}
+
+/* ═══════════════════════════════════════════════
+   NICHOS
+═══════════════════════════════════════════════ */
+.nicho-fluxo {
+  background: rgba(99,102,241,0.06);
+  border: 1px solid rgba(99,102,241,0.18);
+  border-radius: var(--r-lg);
+  padding: 28px 30px;
+  margin: 44px 0 28px;
+}
+.nicho-fluxo h3 {
+  font-family: var(--font-h); font-size: 15px; font-weight: 700;
+  color: var(--indigo-l); margin-bottom: 18px;
+}
+.fluxo {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.fp {
+  padding: 9px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 12.5px; color: var(--text2); flex: 1;
+  text-align: center; min-width: 110px;
+}
+.fp.ok {
+  background: rgba(34,197,94,0.08);
+  border-color: rgba(34,197,94,0.2);
+  color: #86efac; font-weight: 600;
+}
+.fa { color: var(--indigo); font-size: 16px; font-weight: 700; flex-shrink: 0; }
+
+.nicho-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+}
+.nicho-card {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 2px solid rgba(99,102,241,0.45);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(16px);
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+}
+.nicho-card:hover { transform: translateY(-3px); border-color: rgba(99,102,241,0.3); border-top-color: var(--indigo); }
+.nicho-emoji { font-size: 32px; margin-bottom: 13px; display: block; }
+.nicho-nome {
+  font-family: var(--font-h); font-size: 15px; font-weight: 700;
+  color: var(--text); margin-bottom: 13px;
+}
+.nicho-lista { list-style: none; }
+.nicho-lista li {
+  font-size: 12px; color: var(--text2);
+  padding: 5px 0; display: flex; gap: 8px;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  line-height: 1.5;
+}
+.nicho-lista li:last-child { border-bottom: none; }
+.nicho-lista li::before {
+  content:'•'; color: var(--indigo); flex-shrink: 0; font-weight: 700;
+}
+.nicho-destaque {
+  display: flex; gap: 18px; align-items: center;
+  padding: 24px 28px;
+  background: rgba(34,197,94,0.06);
+  border: 1px solid rgba(34,197,94,0.14);
+  border-radius: var(--r-lg);
+  margin-top: 24px;
+}
+.nicho-destaque-ico { font-size: 34px; flex-shrink: 0; }
+.nicho-destaque h4 {
+  font-family: var(--font-h); font-size: 15px; font-weight: 700;
+  color: #86efac; margin-bottom: 6px;
+}
+.nicho-destaque p { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+/* ═══════════════════════════════════════════════
+   COMPARISON TABLE
+═══════════════════════════════════════════════ */
+.comp-wrap {
+  margin-top: 44px;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+}
+.comp-head {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  background: rgba(255,255,255,0.025);
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px; font-weight: 600;
+  align-items: center;
+}
+.comp-head-aiza {
+  text-align: center;
+  background: rgba(99,102,241,0.12);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 8px 8px 0 0;
+  border-bottom: none;
+  padding: 7px 12px;
+  color: var(--indigo-l);
+  font-size: 12.5px; font-weight: 700;
+}
+.comp-head-col { color: var(--text3); text-align: center; }
+.comp-row {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 12px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  align-items: center; font-size: 13px;
+  transition: background 0.15s;
+}
+.comp-row:last-child { border-bottom: none; }
+.comp-row:hover { background: rgba(255,255,255,0.02); }
+.comp-feat { color: var(--text2); font-weight: 500; }
+.cok  { color: var(--green); text-align: center; font-size: 15px; }
+.cno  { color: var(--text3); text-align: center; font-size: 14px; }
+.caiza {
+  text-align: center;
+  background: rgba(99,102,241,0.06);
+  color: var(--text); padding: 2px 8px; border-radius: 6px;
+}
+
+/* ═══════════════════════════════════════════════
+   FUNDADOR
+═══════════════════════════════════════════════ */
+.fundador-wrap {
+  display: flex; gap: 52px; align-items: flex-start;
+  margin-top: 44px;
+}
+.fundador-av {
+  width: 132px; height: 132px;
+  border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 56px;
+  box-shadow: 0 0 50px rgba(99,102,241,0.3);
+  border: 3px solid rgba(99,102,241,0.35);
+}
+.fundador-asp {
+  font-family: var(--font-h);
+  font-size: 80px; color: var(--indigo);
+  opacity: 0.18; line-height: 1;
+  margin-bottom: -20px;
+}
+.fundador-q {
+  font-family: var(--font-h); font-size: 22px; font-weight: 700;
+  color: var(--text); line-height: 1.45; margin-bottom: 20px;
+}
+.fundador-q .hl { color: var(--indigo-l); }
+.fundador-txt {
+  font-size: 14px; color: var(--text2); line-height: 1.9;
+  margin-bottom: 20px;
+}
+.fundador-txt strong { color: var(--text); }
+.relatos { display: grid; gap: 10px; margin-bottom: 20px; }
+.relato {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-size: 13px; color: var(--text2); font-style: italic;
+  border-left: 2px solid rgba(99,102,241,0.4);
+  line-height: 1.65;
+}
+.fundador-nome { font-size: 15px; font-weight: 600; color: var(--text); }
+.fundador-cargo {
+  font-size: 12px; color: var(--indigo-l);
+  font-weight: 500; margin-top: 3px;
+}
+
+/* ═══════════════════════════════════════════════
+   NÚMEROS
+═══════════════════════════════════════════════ */
+.nums-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+  margin-top: 44px;
+}
+.num-card {
+  text-align: center; padding: 28px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(16px);
+  transition: all 0.3s;
+}
+.num-card:hover { border-color: var(--surface-b2); transform: translateY(-2px); }
+.num-val {
+  font-family: var(--font-h); font-size: 40px; font-weight: 800;
+  background: linear-gradient(135deg, var(--indigo-l), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 9px; line-height: 1;
+}
+.num-desc { font-size: 12px; color: var(--text2); line-height: 1.55; }
+
+/* ═══════════════════════════════════════════════
+   PRICING
+═══════════════════════════════════════════════ */
+.precos-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 18px;
+  margin-top: 44px; align-items: start;
+}
+.preco-card {
+  padding: 30px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+}
+.preco-card:hover { transform: translateY(-3px); }
+.preco-card.dest {
+  border-color: rgba(99,102,241,0.38);
+  background: linear-gradient(135deg, rgba(99,102,241,0.07), rgba(139,92,246,0.04));
+  transform: scale(1.03);
+  box-shadow: 0 0 60px rgba(99,102,241,0.13), 0 24px 60px rgba(0,0,0,0.4);
+}
+.preco-card.dest:hover {
+  transform: scale(1.03) translateY(-3px);
+  box-shadow: 0 0 80px rgba(99,102,241,0.18), 0 30px 70px rgba(0,0,0,0.5);
+}
+.popular {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  color: #fff; font-size: 11px; font-weight: 700;
+  padding: 4px 18px; border-radius: 999px; white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+}
+.plano-nome {
+  font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--text3); margin-bottom: 11px;
+}
+.plano-preco { font-family: var(--font-h); margin-bottom: 6px; }
+.p-rs { font-size: 17px; color: var(--text2); vertical-align: top; margin-top: 8px; display: inline-block; }
+.p-val { font-size: 52px; font-weight: 800; color: var(--text); line-height: 1; }
+.plano-per { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+.plano-desc {
+  font-size: 13px; color: var(--text2); line-height: 1.65;
+  margin-bottom: 20px; padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.plano-items { list-style: none; margin-bottom: 24px; }
+.plano-items li {
+  font-size: 13px; color: var(--text2);
+  padding: 7px 0; display: flex; gap: 9px;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.plano-items li:last-child { border-bottom: none; }
+.plano-items li::before {
+  content:'✓'; color: var(--green); font-weight: 700;
+  font-size: 12.5px; flex-shrink: 0; margin-top: 2px;
+}
+.btn-plano {
+  width: 100%; padding: 13px;
+  border-radius: 11px; font-size: 14px; font-weight: 700;
+  border: none; cursor: pointer; font-family: var(--font-b);
+  transition: all 0.25s;
+}
+.btn-plano-p {
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(99,102,241,0.3);
+}
+.btn-plano-p:hover { transform: translateY(-1px); box-shadow: var(--glow-i); }
+.btn-plano-s {
+  background: transparent; color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-plano-s:hover { border-color: var(--border-i); color: var(--text); }
+.eco-box {
+  margin-top: 24px; padding: 16px;
+  background: rgba(34,197,94,0.06);
+  border: 1px solid rgba(34,197,94,0.14);
+  border-radius: var(--r);
+  text-align: center;
+}
+.eco-val {
+  font-family: var(--font-h); font-size: 22px; font-weight: 800;
+  color: var(--green); margin-bottom: 4px;
+}
+.eco-desc { font-size: 12px; color: var(--text2); }
+
+/* ═══════════════════════════════════════════════
+   CTA FINAL
+═══════════════════════════════════════════════ */
+.cta-final {
+  padding: 100px clamp(20px,5vw,72px);
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.cta-final::before {
+  content:''; position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(99,102,241,0.1) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(6,182,212,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(139,92,246,0.06) 0%, transparent 60%);
+  pointer-events:none;
+}
+.cta-inner { position: relative; max-width: 640px; margin: 0 auto; }
+.cta-inner h2 {
+  font-family: var(--font-h);
+  font-size: clamp(28px,4.5vw,52px);
+  font-weight: 800; letter-spacing: -1.5px;
+  color: var(--text); margin-bottom: 18px; line-height: 1.1;
+}
+.cta-inner p {
+  font-size: 17px; color: var(--text2);
+  margin-bottom: 40px; font-weight: 300;
+  line-height: 1.7;
+}
+.cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; }
+.btn-whats {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 34px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff; font-size: 15px; font-weight: 700;
+  border: none; border-radius: var(--r); cursor: pointer;
+  text-decoration: none; font-family: var(--font-b);
+  transition: all 0.25s;
+  box-shadow: 0 8px 28px rgba(34,197,94,0.32);
+}
+.btn-whats:hover { transform: translateY(-2px); box-shadow: var(--glow-g); }
+.btn-sec {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 26px;
+  background: transparent; color: var(--text2);
+  font-size: 15px; font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--r); cursor: pointer;
+  text-decoration: none; font-family: var(--font-b);
+  transition: all 0.25s;
+}
+.btn-sec:hover { border-color: var(--border-i); color: var(--text); }
+.garantias { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.gar { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 6px; }
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer {
+  padding: 32px clamp(20px,5vw,72px);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.foot-logo {
+  display: flex; align-items: center; gap: 10px;
+  justify-content: center; margin-bottom: 12px;
+}
+.foot-logo-a {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-h); font-size: 15px; font-weight: 800; color: #fff;
+}
+.foot-logo-txt {
+  font-family: var(--font-h); font-size: 17px; font-weight: 700; color: var(--text);
+}
+.foot-txt { font-size: 12px; color: var(--text3); }
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+@keyframes fade-up {
+  from { opacity:0; transform:translateY(22px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.reveal {
+  opacity:0; transform:translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.23,1,0.32,1), transform 0.7s cubic-bezier(0.23,1,0.32,1);
+}
+.reveal.on { opacity:1; transform:translateY(0); }
+.d1 { transition-delay: 0.08s; }
+.d2 { transition-delay: 0.16s; }
+.d3 { transition-delay: 0.24s; }
+.d4 { transition-delay: 0.32s; }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .dores-grid, .mercado-grid, .ia-grid, .feat-grid,
+  .precos-grid, .nums-grid, .sup-grid, .nicho-grid { grid-template-columns:1fr; }
+  .preco-card.dest { transform:none; }
+  .fundador-wrap { flex-direction:column; align-items:center; text-align:center; }
+  .comp-head, .comp-row { grid-template-columns:1.8fr 1fr 1fr; }
+  .comp-head > :last-child, .comp-row > :last-child { display:none; }
+}
+@media (max-width: 600px) {
+  .ia-hero-card { flex-direction:column; }
+  .hero-stats { gap:24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<canvas id="cvs"></canvas>
+<div class="grid-bg"></div>
+
+<div class="wrap">
+
+<!-- ═══ HERO ═══════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-orb hero-orb-3"></div>
+
+  <div class="hero-logo">
+    <svg width="62" height="62" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" class="logo-mark">
+      <defs>
+        <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#8b5cf6"/>
+          <stop offset="100%" stop-color="#06b6d4"/>
+        </linearGradient>
+      </defs>
+      <path d="M30 4 L54 56 L44 56 L30 22 L16 56 L6 56 Z" fill="url(#lg1)"/>
+      <path d="M30 22 L42 50 L18 50 Z" fill="#03040e"/>
+      <rect x="6" y="36" width="48" height="7" fill="#03040e"/>
+      <line x1="16" y1="39.5" x2="44" y2="39.5" stroke="url(#lg1)" stroke-width="6"/>
+      <circle cx="30" cy="2" r="4" fill="url(#lg1)"/>
+      <line x1="2" y1="56" x2="14" y2="56" stroke="url(#lg1)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="46" y1="56" x2="58" y2="56" stroke="url(#lg1)" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+    <div class="logo-text">
+      <h1>AIZA AI</h1>
+      <span>Inteligência Artificial para o seu negócio</span>
+    </div>
+  </div>
+
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    O único sistema de gestão do Brasil com IA humanizada
+  </div>
+
+  <h2 class="hero-h2">
+    <span class="white">O sistema completo<br/>que </span><span class="grad">pensa e age<br/>pela sua loja</span>
+  </h2>
+
+  <p class="hero-sub">
+    Estoque, vendas, financeiro, clientes e maquininha — tudo em um só lugar. A IA cuida da gestão, resolve problemas, dá suporte 24h e ainda te diz exatamente o que fazer para vender mais e lucrar mais.
+  </p>
+
+  <div class="hero-chips">
+    <div class="chip"><span class="chip-dot" style="background:var(--indigo)"></span>IA que realmente age — não só responde</div>
+    <div class="chip"><span class="chip-dot" style="background:var(--green)"></span>Suporte 24h sem fila de espera</div>
+    <div class="chip"><span class="chip-dot" style="background:var(--cyan)"></span>Sem cobrar por vendedor cadastrado</div>
+    <div class="chip"><span class="chip-dot" style="background:var(--amber)"></span>14 dias grátis · Sem cartão</div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hstat">
+      <div class="hstat-val" data-target="21700000" data-suffix="M">0</div>
+      <div class="hstat-lbl">negócios no Brasil</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val" data-target="97" data-suffix="%">0</div>
+      <div class="hstat-lbl">sem IA na gestão</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val">R$ 0</div>
+      <div class="hstat-lbl">para começar</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val">5 min</div>
+      <div class="hstat-lbl">para configurar</div>
+    </div>
+  </div>
+
+  <div class="hero-cta">
+    <button class="btn-main">💬 Falar no WhatsApp</button>
+    <button class="btn-ghost">🌐 Ver o sistema ao vivo</button>
+  </div>
+</section>
+
+<!-- ═══ DOR ══════════════════════════════════════════════════ -->
+<div style="background:var(--bg)">
+<div class="sec reveal">
+  <div class="sec-label">O problema que todo lojista conhece</div>
+  <h2 class="sec-titulo">Você trabalha muito mas<br/>o dinheiro some no fim do mês</h2>
+  <p class="sec-sub">Não é falta de trabalho — é falta de informação certa na hora certa. Reconhece alguma dessas situações?</p>
+
+  <div class="dor-intro reveal d1">
+    <div class="dor-intro-ico">😤</div>
+    <div>
+      <h3>Essas dores custam dinheiro real todo dia</h3>
+      <p>Cada uma dessas situações representa vendas perdidas, capital preso e decisões erradas. A maioria dos lojistas convive com isso sem saber o quanto está perdendo. O AIZA AI foi criado para acabar com isso de uma vez por todas.</p>
+    </div>
+  </div>
+
+  <div class="dores-grid">
+    <div class="dor-card reveal d1">
+      <span class="dor-emoji">📦</span>
+      <h3 class="dor-titulo">"Sistema diz que tenho 60 — na prateleira tem 10 ou zero"</h3>
+      <p class="dor-texto">Você olha no sistema, vê o número e confia. Não faz o pedido. Quando o colaborador vai buscar — não tem. Venda perdida. Cliente frustrado. E você nem sabe quanto isso acontece por semana.</p>
+      <div class="dor-quote">"Todo mês eu descobria que o estoque real era metade do que o sistema dizia"</div>
+    </div>
+    <div class="dor-card reveal d2">
+      <span class="dor-emoji">😰</span>
+      <h3 class="dor-titulo">"Cliente encomendou — colaborador esqueceu de pedir"</h3>
+      <p class="dor-texto">Cliente veio, pediu um produto que não tinha, o colaborador prometeu encomendar. Semana seguinte o cliente volta animado para buscar — e o produto nunca foi pedido. Você perdeu o cliente para sempre.</p>
+      <div class="dor-quote">"A cara que eu fazia para o cliente era horrível. Nunca mais voltavam"</div>
+    </div>
+    <div class="dor-card reveal d3">
+      <span class="dor-emoji">📊</span>
+      <h3 class="dor-titulo">"Sistema diz R$ 100k em mercadoria — realidade era R$ 40k"</h3>
+      <p class="dor-texto">Você toma decisões baseado num número que não existe. Compra errado, investe errado, planeja errado. Tudo porque confiou num sistema que não reflete a realidade da sua loja.</p>
+      <div class="dor-quote">"Só descobri a diferença quando fiz o balanço geral — foi um choque"</div>
+    </div>
+    <div class="dor-card reveal d4">
+      <span class="dor-emoji">🏪</span>
+      <h3 class="dor-titulo">"Prateleira cheia mas o dinheiro nunca sobra"</h3>
+      <p class="dor-texto">R$ 40.000 em produto parado que ninguém compra. Capital morto gerando zero retorno. Enquanto o produto que mais vende fica sem estoque porque não tem dinheiro para repor. A loja parece cheia mas está sangrando.</p>
+      <div class="dor-quote">"Trabalhava o mês inteiro e no final sobrava quase nada"</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ MERCADO DOR ═══════════════════════════════════════════ -->
+<div class="dark-sec">
+<div class="sec reveal">
+  <div class="sec-label">O que os lojistas sofrem com os sistemas atuais</div>
+  <h2 class="sec-titulo">Você paga caro por um sistema<br/>que não resolve seus problemas</h2>
+  <p class="sec-sub">Conversamos com lojistas reais. O que eles nos contaram foi revelador.</p>
+
+  <div class="mercado-grid">
+    <div class="mercado-card reveal d1">
+      <span class="mercado-tag">Dor Real #1</span>
+      <div class="mercado-val">R$ 900/mês</div>
+      <h3 class="mercado-titulo">Pagando em 2 sistemas que não conversam entre si</h3>
+      <p class="mercado-desc">Lojistas com 2 lojas precisam de 2 sistemas separados. No final do mês, os dados ficam todos misturados — impossível saber o faturamento e o lucro de cada loja individualmente.</p>
+      <div class="mercado-sol">✅ AIZA AI: até 3 lojas por R$ 247/mês — cada uma com dashboard, relatório e análise separados. Economia de mais de R$ 650 por mês.</div>
+    </div>
+    <div class="mercado-card reveal d2">
+      <span class="mercado-tag">Dor Real #2</span>
+      <div class="mercado-val">+R$ X por vendedor</div>
+      <h3 class="mercado-titulo">Cobrança extra para cada colaborador cadastrado</h3>
+      <p class="mercado-desc">A maioria dos sistemas cobra por usuário. Quanto mais vendedores você tem, mais paga. Isso pune quem cresce e cria um incentivo perverso — dados incompletos para economizar.</p>
+      <div class="mercado-sol">✅ AIZA AI: usuários ilimitados em todos os planos. Cadastre toda a equipe sem pagar nada a mais.</div>
+    </div>
+    <div class="mercado-card reveal d3">
+      <span class="mercado-tag">Dor Real #3</span>
+      <div class="mercado-val">9 a 26 dias</div>
+      <h3 class="mercado-titulo">Tempo de espera para resolver um problema no suporte</h3>
+      <p class="mercado-desc">Bling: média de 9 dias para responder. TOTVS: até 26 dias. Enquanto espera, sua loja para. Venda não registrada. Nota fiscal não emitida. E você tentando resolver sozinho.</p>
+      <div class="mercado-sol">✅ AIZA AI: IA resolve na hora. Se precisar de humano — menos de 5 minutos. Sem fila, sem ticket, sem esperar.</div>
+    </div>
+    <div class="mercado-card reveal d4">
+      <span class="mercado-tag">Dor Real #4</span>
+      <div class="mercado-val">Zero IA</div>
+      <h3 class="mercado-titulo">Os 4 maiores ERPs do Brasil não têm inteligência artificial</h3>
+      <p class="mercado-desc">Bling, UpGestão, Conta Azul, TOTVS — nenhum tem IA. Eles mostram os dados mas não dizem o que fazer. Você vê os números e precisa interpretar tudo sozinho.</p>
+      <div class="mercado-sol">✅ AIZA AI: a IA analisa tudo e te diz exatamente o que fazer. "Esse produto vai acabar em 2 dias — repor agora?" Simples assim.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ IA ═══════════════════════════════════════════════════ -->
+<div style="background:var(--bg)">
+<div class="sec reveal">
+  <div class="sec-label">O coração do AIZA AI</div>
+  <h2 class="sec-titulo">Uma IA humanizada que<br/><span class="g-text">entende o seu negócio de verdade</span></h2>
+  <p class="sec-sub">Não é um chatbot genérico que responde qualquer coisa. É uma IA treinada com os dados reais da sua loja que age, decide e resolve.</p>
+
+  <div class="ia-hero-card reveal d1">
+    <div class="ia-hero-ico">🤖</div>
+    <div>
+      <h3>A diferença entre IA genérica e IA que age</h3>
+      <p>IA genérica responde perguntas gerais de qualquer assunto. A AIZA AI acessa os dados reais da sua loja — seus produtos, suas vendas, seus clientes, suas taxas de maquininha — e usa tudo isso para dar respostas e tomar ações precisas. Ela não adivinha. Ela sabe.</p>
+      <span class="ia-badge">🔒 Powered by Claude (Anthropic) — a mesma IA usada por grandes corporações</span>
+    </div>
+  </div>
+
+  <div class="ia-grid">
+    <div class="ia-card reveal d1">
+      <div class="ia-ico">💬</div>
+      <div class="ia-titulo">Conversa em linguagem natural</div>
+      <div class="ia-desc">Pergunte como se estivesse falando com um gerente. Sem menu, sem comando, sem complicação.</div>
+      <div class="ia-ex">"Como tá o estoque do tênis Nike?" → "Tem 8 unidades do 42. No ritmo atual acaba em 2 dias."</div>
+    </div>
+    <div class="ia-card reveal d2">
+      <div class="ia-ico">⚡</div>
+      <div class="ia-titulo">Age — não só responde</div>
+      <div class="ia-desc">A IA executa ações direto no sistema. Não precisa navegar por menus.</div>
+      <div class="ia-ex">"Repõe 20 unidades do carregador" → IA registra o pedido e notifica o comprador automaticamente.</div>
+    </div>
+    <div class="ia-card reveal d3">
+      <div class="ia-ico">📊</div>
+      <div class="ia-titulo">Relatório mensal automático</div>
+      <div class="ia-desc">Todo dia 1 a IA gera um relatório completo com o que vendeu, lucrou e o que fazer no próximo mês.</div>
+      <div class="ia-ex">"Você perdeu R$ 4.890 por falta de estoque. Aqui está o plano para o mês que vem."</div>
+    </div>
+    <div class="ia-card reveal d1">
+      <div class="ia-ico">🎯</div>
+      <div class="ia-titulo">Estrategista financeiro</div>
+      <div class="ia-desc">Classifica cada produto: estrela, encalhado, margem baixa. E diz o que fazer com cada um.</div>
+      <div class="ia-ex">"Bolsa Caramelo: 22 dias parada, R$ 2.160 preso. Desconto de 20% ainda gera R$ 43 de lucro."</div>
+    </div>
+    <div class="ia-card reveal d2">
+      <div class="ia-ico">🏥</div>
+      <div class="ia-titulo">Diagnóstico de saúde do negócio</div>
+      <div class="ia-desc">Quer abrir uma segunda loja? A IA analisa se você está pronto ou o que precisa resolver antes.</div>
+      <div class="ia-ex">"Você tem 1.2 meses de reserva. O ideal são 3. Em 2 meses você estará pronto para expandir."</div>
+    </div>
+    <div class="ia-card reveal d3">
+      <div class="ia-ico">🔔</div>
+      <div class="ia-titulo">Alerta inteligente proativo</div>
+      <div class="ia-desc">A IA monitora tudo e te avisa antes do problema acontecer — não depois.</div>
+      <div class="ia-ex">"⚠️ Tênis Nike 42 vai esgotar amanhã. Quer que eu registre o pedido de reposição agora?"</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ SUPORTE ════════════════════════════════════════════════ -->
+<div class="dark-sec">
+<div class="sec reveal">
+  <div class="sec-label">Suporte que nenhum concorrente tem</div>
+  <h2 class="sec-titulo">Problema? Resolve na hora.<br/><span class="g-text">Sem esperar. Sem fila.</span></h2>
+  <p class="sec-sub">A IA resolve 85% dos problemas automaticamente. O resto resolve em menos de 5 minutos com suporte humano real.</p>
+
+  <div class="sup-grid">
+    <div class="sup-card deles reveal d1">
+      <span class="sup-tag r">❌ Concorrentes</span>
+      <h3>Como é hoje</h3>
+      <div class="sup-item"><span class="ix">✗</span>Bling: 9 dias e 17 horas para responder</div>
+      <div class="sup-item"><span class="ix">✗</span>TOTVS: até 26 dias de espera</div>
+      <div class="sup-item"><span class="ix">✗</span>Você abre um "ticket" e fica na fila</div>
+      <div class="sup-item"><span class="ix">✗</span>Atendimento apenas em horário comercial</div>
+      <div class="sup-item"><span class="ix">✗</span>Resposta genérica que não resolve</div>
+      <div class="sup-item"><span class="ix">✗</span>Enquanto espera sua loja para</div>
+      <div class="sup-item"><span class="ix">✗</span>Sem histórico — explica o problema do zero</div>
+    </div>
+    <div class="sup-card nosso reveal d2">
+      <span class="sup-tag g">✅ AIZA AI</span>
+      <h3>Como vai ser</h3>
+      <div class="sup-item"><span class="ig">✓</span>IA resolve instantaneamente — 24h por dia</div>
+      <div class="sup-item"><span class="ig">✓</span>Humano em menos de 5 minutos se precisar</div>
+      <div class="sup-item"><span class="ig">✓</span>Sem ticket, sem fila, sem esperar</div>
+      <div class="sup-item"><span class="ig">✓</span>Segunda a sábado das 08h às 22h</div>
+      <div class="sup-item"><span class="ig">✓</span>Resposta específica para o SEU problema</div>
+      <div class="sup-item"><span class="ig">✓</span>IA aprende com cada problema resolvido</div>
+      <div class="sup-item"><span class="ig">✓</span>Histórico completo — nunca explica de novo</div>
+    </div>
+  </div>
+
+  <div class="passos-wrap reveal d3">
+    <h3>Como funciona na prática</h3>
+    <div class="passos">
+      <div class="passo">Você tem um problema</div>
+      <div class="passo-arr">→</div>
+      <div class="passo">Chama a IA no chat</div>
+      <div class="passo-arr">→</div>
+      <div class="passo">IA resolve na hora</div>
+      <div class="passo-arr">→</div>
+      <div class="passo-final">Problema resolvido ✓</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ FEATURES ══════════════════════════════════════════════ -->
+<div style="background:var(--bg)">
+<div class="sec reveal">
+  <div class="sec-label">O que o AIZA AI faz</div>
+  <h2 class="sec-titulo">Tudo que sua loja precisa.<br/><span class="g-text-vio">Com IA em cada detalhe.</span></h2>
+  <p class="sec-sub">Não é só um sistema — é um gerente, um consultor financeiro e um estrategista de vendas. Tudo em um.</p>
+
+  <div class="feat-grid">
+    <div class="feat-card reveal d1">
+      <div class="feat-ico">🛒</div>
+      <div class="feat-titulo">PDV Completo</div>
+      <div class="feat-desc">Caixa rápido com grade por tamanho e cor, PIX, débito, crédito com parcelamento, cálculo de troco e baixa automática no estoque.</div>
+    </div>
+    <div class="feat-card reveal d2">
+      <div class="feat-ico">📦</div>
+      <div class="feat-titulo">Estoque Inteligente</div>
+      <div class="feat-desc">Controle por tamanho, cor e variante. IA avisa antes de acabar, identifica divergências e sugere reposição com a quantidade certa.</div>
+      <span class="feat-excl">IA inclusa</span>
+    </div>
+    <div class="feat-card reveal d3">
+      <div class="feat-ico">📊</div>
+      <div class="feat-titulo">Relatório Mensal IA</div>
+      <div class="feat-desc">Todo dia 1 a IA gera análise completa: o que vendeu, o que lucrou, onde perdeu dinheiro e o que fazer no próximo mês.</div>
+      <span class="feat-excl">Exclusivo AIZA AI</span>
+    </div>
+    <div class="feat-card reveal d1">
+      <div class="feat-ico">💳</div>
+      <div class="feat-titulo">Análise de Maquininha</div>
+      <div class="feat-desc">Compara suas taxas com o mercado e mostra exatamente quanto você poderia economizar trocando de operadora.</div>
+      <span class="feat-excl">Exclusivo AIZA AI</span>
+    </div>
+    <div class="feat-card reveal d2">
+      <div class="feat-ico">📈</div>
+      <div class="feat-titulo">Estrategista Financeiro</div>
+      <div class="feat-desc">IA classifica cada produto: estrela, encalhado ou margem baixa. E diz o que fazer — promover, liquidar ou subir preço.</div>
+      <span class="feat-excl">Exclusivo AIZA AI</span>
+    </div>
+    <div class="feat-card reveal d3">
+      <div class="feat-ico">👥</div>
+      <div class="feat-titulo">CRM de Clientes</div>
+      <div class="feat-desc">Histórico completo de compras, produtos favoritos, sistema de níveis Bronze→Diamante e estratégias de fidelização.</div>
+    </div>
+    <div class="feat-card reveal d1">
+      <div class="feat-ico">🔔</div>
+      <div class="feat-titulo">Central de Pedidos</div>
+      <div class="feat-desc">Cliente pediu e não tinha? Sistema registra, acumula a demanda e avisa automaticamente quando o produto chegar.</div>
+      <span class="feat-excl">Exclusivo AIZA AI</span>
+    </div>
+    <div class="feat-card reveal d2">
+      <div class="feat-ico">💰</div>
+      <div class="feat-titulo">Fluxo de Caixa</div>
+      <div class="feat-desc">Entradas, saídas, saldo por conta bancária, fechamento de caixa e análise da IA sobre onde você está perdendo dinheiro.</div>
+    </div>
+    <div class="feat-card reveal d3">
+      <div class="feat-ico">📷</div>
+      <div class="feat-titulo">Scanner de Produtos</div>
+      <div class="feat-desc">Tira foto do código de barras — a IA identifica o produto, preenche os dados e cadastra no estoque automaticamente.</div>
+      <span class="feat-excl">Exclusivo AIZA AI</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ NICHOS ═════════════════════════════════════════════════ -->
+<div class="dark-sec">
+<div class="sec reveal">
+  <div class="sec-label">Um sistema feito para o SEU negócio</div>
+  <h2 class="sec-titulo">Se adapta ao seu ramo.<br/><span class="g-text">Automaticamente.</span></h2>
+  <p class="sec-sub">Na primeira vez que você entra, o AIZA AI pergunta qual é o seu negócio e se transforma para funcionar do jeito certo para você.</p>
+
+  <div class="nicho-fluxo reveal d1">
+    <h3>Como funciona em 4 passos</h3>
+    <div class="fluxo">
+      <div class="fp">Você entra pela primeira vez</div>
+      <div class="fa">→</div>
+      <div class="fp">Seleciona seu ramo</div>
+      <div class="fa">→</div>
+      <div class="fp">Sistema configura automaticamente</div>
+      <div class="fa">→</div>
+      <div class="fp ok">AIZA AI pronto para o seu negócio ✓</div>
+    </div>
+  </div>
+
+  <div class="nicho-grid">
+    <div class="nicho-card reveal d1">
+      <span class="nicho-emoji">👗</span>
+      <div class="nicho-nome">Moda e Vestuário</div>
+      <ul class="nicho-lista">
+        <li>Grade por tamanho e cor (P/M/G/GG)</li>
+        <li>Alerta de coleção parada</li>
+        <li>Sazonalidade verão/inverno</li>
+        <li>Histórico de estilo por cliente</li>
+        <li>IA fala em termos de moda</li>
+      </ul>
+    </div>
+    <div class="nicho-card reveal d2">
+      <span class="nicho-emoji">👟</span>
+      <div class="nicho-nome">Calçados</div>
+      <ul class="nicho-lista">
+        <li>Grade por numeração (33 ao 47)</li>
+        <li>Alerta por número esgotado</li>
+        <li>Reposição por giro de número</li>
+        <li>Controle por modelo e cor</li>
+        <li>IA identifica número mais vendido</li>
+      </ul>
+    </div>
+    <div class="nicho-card reveal d3">
+      <span class="nicho-emoji">✂️</span>
+      <div class="nicho-nome">Barbearia</div>
+      <ul class="nicho-lista">
+        <li>Agenda por barbeiro</li>
+        <li>Comissão automática por serviço</li>
+        <li>Histórico de corte do cliente</li>
+        <li>Clube de assinatura mensal</li>
+        <li>Lembretes automáticos WhatsApp</li>
+      </ul>
+    </div>
+    <div class="nicho-card reveal d1">
+      <span class="nicho-emoji">💄</span>
+      <div class="nicho-nome">Cosméticos e Perfumaria</div>
+      <ul class="nicho-lista">
+        <li>Controle por fragrância e ml</li>
+        <li>Data de validade dos produtos</li>
+        <li>Programa de fidelidade automático</li>
+        <li>Recomendação por tipo de pele</li>
+        <li>IA sugere produtos complementares</li>
+      </ul>
+    </div>
+    <div class="nicho-card reveal d2">
+      <span class="nicho-emoji">🛒</span>
+      <div class="nicho-nome">Mercadinho e Mercearia</div>
+      <ul class="nicho-lista">
+        <li>Alerta de vencimento automático</li>
+        <li>Giro de estoque diário</li>
+        <li>Controle de perecíveis</li>
+        <li>CMV por categoria</li>
+        <li>Reposição por dia da semana</li>
+      </ul>
+    </div>
+    <div class="nicho-card reveal d3">
+      <span class="nicho-emoji">📱</span>
+      <div class="nicho-nome">Eletrônicos e Celular</div>
+      <ul class="nicho-lista">
+        <li>Controle por número de série</li>
+        <li>Módulo de garantia e assistência</li>
+        <li>Alerta de produto de alto valor parado</li>
+        <li>Histórico de conserto por aparelho</li>
+        <li>IA monitora margem por modelo</li>
+      </ul>
+    </div>
+    <div class="nicho-card reveal d1">
+      <span class="nicho-emoji">📚</span>
+      <div class="nicho-nome">Papelaria</div>
+      <ul class="nicho-lista">
+        <li>Sazonalidade volta às aulas</li>
+        <li>Promoção automática por período</li>
+        <li>Controle por fornecedor</li>
+        <li>IA prevê demanda sazonal</li>
+        <li>Mix de produto amplo</li>
+      </ul>
+    </div>
+    <div class="nicho-card reveal d2">
+      <span class="nicho-emoji">💇</span>
+      <div class="nicho-nome">Salão de Beleza</div>
+      <ul class="nicho-lista">
+        <li>Agenda por profissional</li>
+        <li>Comissão por serviço e produto</li>
+        <li>Histórico de serviço da cliente</li>
+        <li>Controle de produtos usados</li>
+        <li>Fidelização automática</li>
+      </ul>
+    </div>
+    <div class="nicho-card reveal d3">
+      <span class="nicho-emoji">🏪</span>
+      <div class="nicho-nome">Outros negócios</div>
+      <ul class="nicho-lista">
+        <li>Sistema base completo</li>
+        <li>IA aprende com seu histórico</li>
+        <li>Suporte para configurar junto</li>
+        <li>Você personaliza os campos</li>
+        <li>Módulos novos chegando em breve</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nicho-destaque reveal d2">
+    <div class="nicho-destaque-ico">🚀</div>
+    <div>
+      <h4>Não encontrou seu nicho? Sem problema.</h4>
+      <p>O AIZA AI tem um módulo base que funciona para qualquer negócio. Nossa equipe configura o sistema junto com você gratuitamente durante os 14 dias de teste. Basta falar no WhatsApp.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ COMPARATIVO ═══════════════════════════════════════════ -->
+<div style="background:var(--bg)">
+<div class="sec reveal">
+  <div class="sec-label">Por que o AIZA AI</div>
+  <h2 class="sec-titulo">Tudo que os outros têm.<br/><span class="g-text">Mais o que só o AIZA AI tem.</span></h2>
+
+  <div class="comp-wrap">
+    <div class="comp-head">
+      <div></div>
+      <div class="comp-head-aiza">AIZA AI</div>
+      <div class="comp-head-col">Bling</div>
+      <div class="comp-head-col">UpGestão</div>
+    </div>
+    <div class="comp-row"><div class="comp-feat">PDV e Controle de estoque</div><div class="cok caiza">✓</div><div class="cok">✓</div><div class="cok">✓</div></div>
+    <div class="comp-row"><div class="comp-feat">Emissão de NFC-e</div><div class="cok caiza">✓</div><div class="cok">✓</div><div class="cok">✓</div></div>
+    <div class="comp-row"><div class="comp-feat">IA que age e executa comandos</div><div class="cok caiza">✓</div><div class="cno">—</div><div class="cno">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Relatório mensal automático com IA</div><div class="cok caiza">✓</div><div class="cno">—</div><div class="cno">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Análise de taxas de maquininha</div><div class="cok caiza">✓</div><div class="cno">—</div><div class="cno">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Estrategista financeiro com IA</div><div class="cok caiza">✓</div><div class="cno">—</div><div class="cno">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Diagnóstico de saúde do negócio</div><div class="cok caiza">✓</div><div class="cno">—</div><div class="cno">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Suporte resolvido em minutos</div><div class="cok caiza">✓</div><div class="cno">9 dias</div><div class="cno">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Sem cobrar por vendedor</div><div class="cok caiza">✓</div><div class="cno">—</div><div class="cno">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Multi-loja com dados separados</div><div class="cok caiza">✓</div><div class="cno">—</div><div class="cno">—</div></div>
+    <div class="comp-row" style="font-weight:700">
+      <div class="comp-feat">Preço por mês</div>
+      <div class="caiza" style="font-weight:800;color:var(--green)">R$ 79–247</div>
+      <div class="cno">R$ 349+</div>
+      <div class="cno">R$ 200+</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ FUNDADOR ═══════════════════════════════════════════════ -->
+<div class="dark-sec">
+<div class="sec reveal">
+  <div class="sec-label">A história por trás do AIZA AI</div>
+  <h2 class="sec-titulo">Criado por quem viveu<br/>cada uma dessas dores</h2>
+
+  <div class="fundador-wrap">
+    <div class="fundador-av">👨‍💼</div>
+    <div>
+      <div class="fundador-asp">"</div>
+      <div class="fundador-q">Tive mais de 5 lojas. Senti na pele <span class="hl">cada uma dessas dores</span>.</div>
+      <p class="fundador-txt">
+        Fui lojista por anos. Mais de 5 lojas em segmentos diferentes. Usava sistema de gestão como todo lojista. Confiava nos números. Tomava decisões baseado neles.<br/><br/>
+        <strong>Até descobrir que os números eram mentira — em todas elas.</strong>
+      </p>
+      <div class="relatos">
+        <div class="relato">📦 "Meu sistema dizia que eu tinha R$ 100 mil em mercadoria. Na realidade tinha R$ 40 mil. Tomei decisões erradas durante meses baseado num número falso."</div>
+        <div class="relato">🔋 "Toda semana eu olhava no sistema — 60 carregadores — e não pedia. Quando o colaborador ia buscar: zero unidades. Venda perdida toda semana."</div>
+        <div class="relato">😰 "Quantas vezes um cliente fez encomenda, o colaborador esqueceu de registrar, e o cliente voltou na semana seguinte para buscar um produto que nunca foi pedido."</div>
+        <div class="relato">📊 "Fechava a loja, parava toda a equipe, passava o dia fazendo balanço. No final: diferença enorme entre o sistema e a realidade. Acontecia todo ano."</div>
+        <div class="relato">💸 "Minha prateleira estava cheia de produto que não vendia. R$ 40 mil em capital morto. Enquanto o produto que mais vende ficava sem estoque."</div>
+      </div>
+      <p class="fundador-txt">
+        Depois de tudo isso, decidi criar o AIZA AI. Porque eu sabia exatamente o que faltava — não como programador, mas como lojista que viveu cada uma dessas dores na pele. Para que você tome decisões baseado em dados reais. Para que a IA faça o trabalho de gestão enquanto você foca no que importa: <strong>atender bem, vender mais e crescer.</strong>
+      </p>
+      <div class="fundador-nome">Hamuda · Fundador do AIZA AI</div>
+      <div class="fundador-cargo">lojista com mais de 5 lojas · Criador do primeiro sistema de gestão com IA humanizada do Brasil</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ NÚMEROS ════════════════════════════════════════════════ -->
+<div style="background:var(--bg)">
+<div class="sec reveal">
+  <div class="sec-label">O tamanho da oportunidade</div>
+  <h2 class="sec-titulo">O maior mercado do Brasil<br/><span class="g-text">ainda sem inteligência artificial</span></h2>
+
+  <div class="nums-grid">
+    <div class="num-card reveal d1">
+      <div class="num-val">21,7M</div>
+      <div class="num-desc">micro e pequenas empresas no Brasil</div>
+    </div>
+    <div class="num-card reveal d2">
+      <div class="num-val">43%</div>
+      <div class="num-desc">ainda usam caderno ou planilha</div>
+    </div>
+    <div class="num-card reveal d3">
+      <div class="num-val">97%</div>
+      <div class="num-desc">sem nenhuma IA na gestão</div>
+    </div>
+    <div class="num-card reveal d4">
+      <div class="num-val">524</div>
+      <div class="num-desc">novos negócios abrem por dia no Brasil</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ PREÇOS ═════════════════════════════════════════════════ -->
+<div class="dark-sec">
+<div class="sec reveal">
+  <div class="sec-label">Preços simples e honestos</div>
+  <h2 class="sec-titulo">Sem contrato. Sem surpresa.<br/><span class="g-text">Cancela quando quiser.</span></h2>
+  <p class="sec-sub">14 dias grátis em qualquer plano. Sem cartão de crédito para começar. Sem cobrar por vendedor cadastrado.</p>
+
+  <div class="precos-grid">
+    <!-- Essencial -->
+    <div class="preco-card reveal d1">
+      <div class="plano-nome">Essencial</div>
+      <div class="plano-preco">
+        <span class="p-rs">R$</span><span class="p-val">79</span>
+      </div>
+      <div class="plano-per">/mês · sem contrato</div>
+      <p class="plano-desc">Para lojistas que estão começando e querem organizar a casa com inteligência.</p>
+      <ul class="plano-items">
+        <li>PDV completo com grade</li>
+        <li>Controle de estoque inteligente</li>
+        <li>Fluxo de caixa</li>
+        <li>Até 500 produtos</li>
+        <li>IA básica com alertas</li>
+        <li>Usuários ilimitados</li>
+        <li>Suporte por WhatsApp</li>
+      </ul>
+      <button class="btn-plano btn-plano-s">Começar grátis</button>
+    </div>
+
+    <!-- Pro (destaque) -->
+    <div class="preco-card dest reveal d2">
+      <span class="popular">⭐ Mais escolhido</span>
+      <div class="plano-nome">Pro</div>
+      <div class="plano-preco">
+        <span class="p-rs" style="color:var(--indigo-l)">R$</span>
+        <span class="p-val" style="background:linear-gradient(135deg,var(--indigo-l),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">147</span>
+      </div>
+      <div class="plano-per">/mês · sem contrato</div>
+      <p class="plano-desc">Para lojistas que querem crescer com inteligência e tomar decisões baseadas em dados reais.</p>
+      <ul class="plano-items">
+        <li>Tudo do Essencial</li>
+        <li>IA completa — age e executa</li>
+        <li>Relatório mensal automático</li>
+        <li>Análise de maquininhas</li>
+        <li>CRM de clientes completo</li>
+        <li>Central de pedidos</li>
+        <li>Scanner de produtos com IA</li>
+        <li>Emissão NFC-e inclusa</li>
+        <li>Produtos ilimitados</li>
+        <li>Diagnóstico de saúde do negócio</li>
+      </ul>
+      <button class="btn-plano btn-plano-p">Começar grátis →</button>
+    </div>
+
+    <!-- Elite -->
+    <div class="preco-card reveal d3">
+      <div class="plano-nome">Elite</div>
+      <div class="plano-preco">
+        <span class="p-rs">R$</span><span class="p-val">247</span>
+      </div>
+      <div class="plano-per">/mês · sem contrato</div>
+      <p class="plano-desc">Para lojistas com múltiplas lojas. Cada unidade com dados separados e relatório individual.</p>
+      <ul class="plano-items">
+        <li>Tudo do Pro</li>
+        <li>Até 3 lojas com dados separados</li>
+        <li>Relatório por loja + consolidado</li>
+        <li>Comparativo de performance entre lojas</li>
+        <li>Transferência de estoque entre lojas</li>
+        <li>Assistente IA por WhatsApp</li>
+        <li>Migração automática (Bling/Omie)</li>
+        <li>Gerente de conta dedicado</li>
+      </ul>
+      <button class="btn-plano btn-plano-s">Falar com consultor</button>
+      <div class="eco-box">
+        <div class="eco-val">Economize R$ 653/mês</div>
+        <div class="eco-desc">vs pagar R$ 900 em 2 sistemas separados que não separam suas lojas</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ CTA FINAL ══════════════════════════════════════════════ -->
+<section class="cta-final">
+  <div class="cta-inner reveal">
+    <div class="sec-label" style="justify-content:center;margin-bottom:20px">Comece hoje</div>
+    <h2>Sua loja merece um sistema<br/>que <span class="g-text">trabalha por você</span></h2>
+    <p>14 dias grátis. Sem cartão. Sem contrato. Começa em 5 minutos.</p>
+    <div class="cta-btns">
+      <a href="#" class="btn-whats">💬 Falar no WhatsApp</a>
+      <a href="#" class="btn-sec">🌐 Ver o sistema ao vivo</a>
+    </div>
+    <div class="garantias">
+      <span class="gar">✓ 14 dias grátis sem cartão</span>
+      <span class="gar">✓ Sem cobrar por vendedor</span>
+      <span class="gar">✓ Suporte em minutos</span>
+      <span class="gar">✓ Cancela quando quiser</span>
+      <span class="gar">✓ IA 24h incluída</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer>
+  <div class="foot-logo">
+    <svg width="32" height="32" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
+      <path d="M30 4 L54 56 L44 56 L30 22 L16 56 L6 56 Z" fill="url(#lg2)"/>
+      <path d="M30 22 L42 50 L18 50 Z" fill="#03040e"/>
+      <rect x="6" y="36" width="48" height="7" fill="#03040e"/>
+      <line x1="16" y1="39.5" x2="44" y2="39.5" stroke="url(#lg2)" stroke-width="6"/>
+      <circle cx="30" cy="2" r="4" fill="url(#lg2)"/>
+    </svg>
+    <div class="foot-logo-txt">AIZA AI</div>
+  </div>
+  <div class="foot-txt">© 2026 AIZA AI · O sistema completo com IA humanizada para lojistas brasileiros · aizaai.com.br</div>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+/* ── PARTICLES ──────────────────────────────────────── */
+(function(){
+  const c = document.getElementById('cvs');
+  const x = c.getContext('2d');
+  let W, H, pts = [];
+  const N = 55, D = 120;
+
+  function resize(){ W = c.width = innerWidth; H = c.height = innerHeight; }
+  function mk(){ return { x:Math.random()*W, y:Math.random()*H, vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3, r:Math.random()*1.2+.4, a:Math.random()*.35+.08 }; }
+  function init(){ pts = Array.from({length:N}, mk); }
+
+  function draw(){
+    x.clearRect(0,0,W,H);
+    for(let i=0;i<pts.length;i++){
+      const p=pts[i];
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W) p.vx*=-1;
+      if(p.y<0||p.y>H) p.vy*=-1;
+      x.beginPath();
+      x.arc(p.x,p.y,p.r,0,Math.PI*2);
+      x.fillStyle=`rgba(99,102,241,${p.a})`;
+      x.fill();
+      for(let j=i+1;j<pts.length;j++){
+        const q=pts[j];
+        const dx=p.x-q.x, dy=p.y-q.y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<D){
+          x.beginPath();
+          x.moveTo(p.x,p.y);
+          x.lineTo(q.x,q.y);
+          x.strokeStyle=`rgba(99,102,241,${(1-dist/D)*.08})`;
+          x.lineWidth=.5;
+          x.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  resize(); init(); draw();
+  window.addEventListener('resize',()=>{ resize(); init(); });
+})();
+
+/* ── REVEAL ON SCROLL ──────────────────────────────── */
+const ro = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('on'); ro.unobserve(e.target); } });
+},{threshold:.1, rootMargin:'0px 0px -32px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+</script>
+
+</body>
+</html>
