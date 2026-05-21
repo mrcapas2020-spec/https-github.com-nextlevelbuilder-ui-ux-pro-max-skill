@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Aiza AI — A IA que opera sua empresa</title>
+<meta name="description" content="Aiza AI opera seu estoque, vendas e financeiro 24h por dia. Menos gestão. Mais resultado. 14 dias grátis."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<style>
+/* ════════════════════════════════════════════════════
+   DESIGN TOKENS — Cinema Dark × Linear × Vercel
+════════════════════════════════════════════════════ */
+:root {
+  /* Backgrounds */
+  --bg:        #07070f;
+  --bg-2:      #0a0a16;
+  --bg-3:      #0d0d1f;
+  --surface:   rgba(255,255,255,0.04);
+  --surface-h: rgba(255,255,255,0.07);
+  --glass:     rgba(10,10,22,0.80);
+
+  /* Borders */
+  --b:   rgba(255,255,255,0.08);
+  --b-h: rgba(255,255,255,0.14);
+  --b-i: rgba(94,106,210,0.35);
+
+  /* Brand */
+  --p:   #5e6ad2;   /* Linear blue-indigo */
+  --p-l: #818cf8;
+  --v:   #8b5cf6;   /* violet */
+  --c:   #06b6d4;   /* cyan */
+  --g:   #22c55e;   /* green */
+  --r:   #ef4444;
+  --a:   #f59e0b;
+
+  /* Text */
+  --t:   #ededef;
+  --t2:  #8a8f98;
+  --t3:  #3d4050;
+
+  /* Typography */
+  --fh: 'Syne', sans-serif;
+  --fb: 'DM Sans', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+
+  /* Easing (Linear-style) */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ════════════════════════════════════════════════════
+   RESET + BASE
+════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--t);
+  font-family: var(--fb);
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: var(--fb); cursor: pointer; }
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--p); border-radius: 2px; }
+
+/* ════════════════════════════════════════════════════
+   AMBIENT BACKGROUND SYSTEM
+════════════════════════════════════════════════════ */
+.ambient {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  overflow: hidden;
+}
+.blob {
+  position: absolute; border-radius: 50%;
+  filter: blur(100px); will-change: transform;
+}
+.blob-1 {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(94,106,210,0.14) 0%, transparent 70%);
+  top: -200px; left: 50%; transform: translateX(-50%);
+  animation: blob-drift 18s ease-in-out infinite alternate;
+}
+.blob-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%);
+  bottom: 20%; right: -100px;
+  animation: blob-drift 24s ease-in-out infinite alternate-reverse;
+}
+.blob-3 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%);
+  bottom: 40%; left: -80px;
+  animation: blob-drift 20s ease-in-out infinite alternate;
+}
+@keyframes blob-drift {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(30px, 40px); }
+}
+
+/* Grid lines */
+.grid-lines {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 30%, black 0%, transparent 80%);
+  mask-image: radial-gradient(ellipse 90% 90% at 50% 30%, black 0%, transparent 80%);
+}
+
+.page { position: relative; z-index: 1; }
+
+/* ════════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 60px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 4vw, 64px);
+  background: rgba(7, 7, 15, 0.7);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+nav.scrolled { border-bottom-color: var(--b); }
+
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--fh); font-weight: 700; font-size: 17px;
+}
+.nav-logo-mark {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--p), var(--v));
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 16px rgba(94,106,210,0.4);
+}
+.nav-logo-mark svg { width: 16px; height: 16px; }
+.nav-logo-name {
+  background: linear-gradient(90deg, var(--t) 60%, var(--p-l));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-links {
+  display: flex; align-items: center; gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 13.5px; font-weight: 500; color: var(--t2);
+  transition: color 0.2s;
+  letter-spacing: 0.01em;
+}
+.nav-links a:hover { color: var(--t); }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-btn-ghost {
+  padding: 7px 16px; font-size: 13.5px; font-weight: 500;
+  color: var(--t2); background: transparent;
+  border: 1px solid var(--b); border-radius: 8px;
+  transition: all 0.2s;
+}
+.nav-btn-ghost:hover { border-color: var(--b-h); color: var(--t); }
+.nav-btn-cta {
+  padding: 7px 18px; font-size: 13.5px; font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--p), var(--v));
+  border: none; border-radius: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(94,106,210,0.3);
+}
+.nav-btn-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(94,106,210,0.45); }
+
+/* ════════════════════════════════════════════════════
+   HERO
+════════════════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 120px clamp(20px, 5vw, 80px) 80px;
+  text-align: center;
+  position: relative;
+}
+/* Top gradient arch */
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 900px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--p), var(--v), transparent);
+  opacity: 0.5;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 14px; border-radius: 999px;
+  border: 1px solid var(--b-i);
+  background: rgba(94,106,210,0.08);
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--p-l);
+  margin-bottom: 36px;
+  animation: hero-in 0.8s var(--ease) both;
+}
+.eyebrow-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--p-l);
+  box-shadow: 0 0 6px var(--p-l);
+  animation: dot-pulse 2s ease-in-out infinite;
+}
+@keyframes dot-pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+
+.hero-h1 {
+  font-family: var(--fh);
+  font-size: clamp(48px, 8.5vw, 100px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.0;
+  margin-bottom: 28px;
+  animation: hero-in 0.8s 0.1s var(--ease) both;
+}
+.hero-h1-line1 { display: block; color: var(--t); }
+.hero-h1-line2 {
+  display: block;
+  background: linear-gradient(135deg, var(--p-l) 0%, var(--c) 45%, var(--v) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% auto;
+  animation: grad-flow 6s ease infinite, hero-in 0.8s 0.15s var(--ease) both;
+}
+@keyframes grad-flow {
+  0%,100% { background-position: 0% center; }
+  50%      { background-position: 100% center; }
+}
+
+.hero-sub {
+  font-size: clamp(16px, 2.2vw, 20px);
+  color: var(--t2); font-weight: 300; line-height: 1.65;
+  max-width: 580px; margin: 0 auto 48px;
+  animation: hero-in 0.8s 0.2s var(--ease) both;
+}
+.hero-sub strong { color: var(--t); font-weight: 500; }
+
+.hero-actions {
+  display: flex; align-items: center; gap: 14px;
+  justify-content: center; flex-wrap: wrap;
+  margin-bottom: 80px;
+  animation: hero-in 0.8s 0.28s var(--ease) both;
+}
+.btn-cta-lg {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; font-size: 15px; font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--p), var(--v));
+  border: none; border-radius: 10px;
+  transition: all 0.25s var(--ease);
+  box-shadow: 0 0 0 1px rgba(94,106,210,0.3), 0 8px 32px rgba(94,106,210,0.3);
+  position: relative; overflow: hidden;
+}
+.btn-cta-lg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+  transition: opacity 0.25s;
+}
+.btn-cta-lg:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(94,106,210,0.5), 0 12px 40px rgba(94,106,210,0.45); }
+
+.btn-demo {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 24px; font-size: 15px; font-weight: 500;
+  color: var(--t2); background: transparent;
+  border: 1px solid var(--b); border-radius: 10px;
+  transition: all 0.25s var(--ease);
+}
+.btn-demo:hover { border-color: var(--b-h); color: var(--t); }
+.btn-demo-arr { transition: transform 0.25s; }
+.btn-demo:hover .btn-demo-arr { transform: translateX(3px); }
+
+/* ── STREAM VISUAL ── */
+.hero-stream {
+  width: 100%; max-width: 780px;
+  animation: hero-in 0.9s 0.36s var(--ease) both;
+}
+.stream-shell {
+  background: var(--glass);
+  border: 1px solid var(--b);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 24px 80px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.stream-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--b);
+  background: rgba(255,255,255,0.025);
+}
+.sdot { width: 9px; height: 9px; border-radius: 50%; }
+.sdot-r { background: #ff5f57; }
+.sdot-y { background: #ffbd2e; }
+.sdot-g { background: #28c840; }
+.stream-bar-label {
+  font-family: var(--fm); font-size: 12px; color: var(--t3);
+  flex: 1; padding-left: 8px;
+}
+.live-pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 2px 10px; border-radius: 999px;
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.2);
+  font-size: 10.5px; font-weight: 600; color: var(--g);
+  font-family: var(--fm);
+}
+.live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--g);
+  animation: dot-pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 5px var(--g);
+}
+
+.stream-body {
+  padding: 22px 24px;
+  min-height: 240px;
+  font-family: var(--fm);
+  font-size: 12.5px;
+  line-height: 1.7;
+  text-align: left;
+  display: flex; flex-direction: column; gap: 0;
+}
+.stream-line {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+  animation: none;
+}
+.stream-line:last-child { border-bottom: none; }
+.stream-line.visible { opacity: 1; transform: translateY(0); }
+
+.stream-time { color: var(--t3); min-width: 44px; flex-shrink: 0; }
+.stream-icon { font-size: 12px; min-width: 16px; text-align: center; flex-shrink: 0; }
+.stream-text { color: var(--t2); }
+.stream-text .hl { color: var(--t); font-weight: 500; }
+.stream-text .num { color: var(--g); }
+.stream-text .warn { color: var(--a); }
+.stream-text .act { color: var(--p-l); }
+.stream-cursor {
+  display: inline-block; width: 7px; height: 13px;
+  background: var(--p-l); vertical-align: middle;
+  margin-left: 4px;
+  animation: blink 1s step-start infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+@keyframes hero-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ════════════════════════════════════════════════════
+   PROOF BAR
+════════════════════════════════════════════════════ */
+.proof-bar {
+  border-top: 1px solid var(--b);
+  border-bottom: 1px solid var(--b);
+  padding: 20px clamp(20px,5vw,64px);
+  display: flex; align-items: center; justify-content: center;
+  gap: clamp(24px, 5vw, 64px);
+  flex-wrap: wrap;
+  background: rgba(255,255,255,0.01);
+}
+.proof-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--t3); font-weight: 500;
+}
+.proof-item span { color: var(--t2); }
+.proof-sep { width: 1px; height: 20px; background: var(--b); }
+
+/* ════════════════════════════════════════════════════
+   SECTION SYSTEM
+════════════════════════════════════════════════════ */
+.s { padding: 120px clamp(20px, 5vw, 80px); }
+.s-inner { max-width: 1040px; margin: 0 auto; }
+.s-center { text-align: center; }
+.s-center .s-sub { margin: 0 auto; }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--p-l); margin-bottom: 16px;
+}
+.eyebrow::before { content:''; display:block; width:16px; height:1px; background:var(--p-l); }
+
+.s-h2 {
+  font-family: var(--fh);
+  font-size: clamp(32px, 4.5vw, 60px);
+  font-weight: 800; letter-spacing: -0.03em;
+  line-height: 1.06; margin-bottom: 20px; color: var(--t);
+}
+.s-h2 .g {
+  background: linear-gradient(135deg, var(--p-l), var(--c));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.s-h2 .gv {
+  background: linear-gradient(135deg, var(--p-l), var(--v));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.s-sub {
+  font-size: clamp(15px, 2vw, 18px);
+  color: var(--t2); font-weight: 300; line-height: 1.75;
+  max-width: 540px;
+}
+
+.alt-bg { background: var(--bg-2); border-top: 1px solid var(--b); border-bottom: 1px solid var(--b); }
+
+/* ════════════════════════════════════════════════════
+   REVEAL ANIMATIONS
+════════════════════════════════════════════════════ */
+.rv {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+.rv.on { opacity: 1; transform: translateY(0); }
+.rv.d1 { transition-delay: 0.08s; }
+.rv.d2 { transition-delay: 0.16s; }
+.rv.d3 { transition-delay: 0.24s; }
+.rv.d4 { transition-delay: 0.32s; }
+.rv.d5 { transition-delay: 0.40s; }
+
+/* ════════════════════════════════════════════════════
+   GAP SECTION — "97%"
+════════════════════════════════════════════════════ */
+.gap-number {
+  font-family: var(--fh);
+  font-size: clamp(80px, 18vw, 200px);
+  font-weight: 800; letter-spacing: -0.05em;
+  line-height: 0.9;
+  background: linear-gradient(135deg, var(--p) 0%, var(--p-l) 40%, var(--c) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block; margin-bottom: 32px;
+}
+.gap-label {
+  font-size: clamp(20px, 3vw, 32px);
+  color: var(--t); font-family: var(--fh); font-weight: 700;
+  letter-spacing: -0.02em; margin-bottom: 14px; line-height: 1.3;
+}
+.gap-sub { font-size: 17px; color: var(--t2); font-weight: 300; line-height: 1.7; max-width: 520px; }
+
+/* Before / After split */
+.ba-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  border: 1px solid var(--b);
+  border-radius: 16px; overflow: hidden;
+  margin-top: 72px;
+}
+.ba-col {
+  padding: 40px 36px;
+  position: relative;
+}
+.ba-col.before {
+  background: rgba(239,68,68,0.04);
+}
+.ba-col.after {
+  background: rgba(94,106,210,0.05);
+  border-left: 1px solid var(--b);
+}
+.ba-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; padding: 4px 12px; border-radius: 999px;
+  margin-bottom: 24px;
+}
+.ba-tag.r { background: rgba(239,68,68,0.12); color: var(--r); border: 1px solid rgba(239,68,68,0.2); }
+.ba-tag.b { background: rgba(94,106,210,0.12); color: var(--p-l); border: 1px solid var(--b-i); }
+.ba-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+.ba-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 14px; color: var(--t2); line-height: 1.5;
+}
+.ba-item:last-child { border-bottom: none; }
+.ba-item .ba-ico { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.ba-item.r .ba-ico { filter: grayscale(0.3) opacity(0.7); }
+
+/* ════════════════════════════════════════════════════
+   AI ACTIONS — Feature Rows
+════════════════════════════════════════════════════ */
+.feat-rows { margin-top: 64px; }
+.feat-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0; align-items: center;
+  padding: 56px 0;
+  border-bottom: 1px solid var(--b);
+}
+.feat-row:first-child { padding-top: 0; }
+.feat-row:last-child { border-bottom: none; padding-bottom: 0; }
+.feat-row.rev { direction: rtl; }
+.feat-row.rev > * { direction: ltr; }
+
+.feat-content { padding-right: 60px; }
+.feat-row.rev .feat-content { padding-right: 0; padding-left: 60px; }
+
+.feat-label {
+  font-family: var(--fm); font-size: 11px; color: var(--p-l);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.feat-label::before { content:'→'; }
+
+.feat-h3 {
+  font-family: var(--fh); font-size: clamp(22px, 3vw, 32px);
+  font-weight: 700; letter-spacing: -0.02em;
+  color: var(--t); line-height: 1.2; margin-bottom: 14px;
+}
+.feat-p { font-size: 15px; color: var(--t2); line-height: 1.75; margin-bottom: 20px; }
+
+.feat-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 600;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.18);
+  color: var(--g);
+}
+
+.feat-visual {
+  background: var(--surface);
+  border: 1px solid var(--b);
+  border-radius: 14px;
+  padding: 24px;
+  backdrop-filter: blur(16px);
+  position: relative; overflow: hidden;
+}
+.feat-visual::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--p-l), transparent);
+  opacity: 0.4;
+}
+
+/* Mini terminal */
+.mini-term {
+  font-family: var(--fm); font-size: 12px; line-height: 1.9;
+}
+.mt-line { display: flex; gap: 10px; padding: 3px 0; }
+.mt-prompt { color: var(--p-l); flex-shrink: 0; }
+.mt-out    { color: var(--t2); }
+.mt-ok     { color: var(--g); }
+.mt-warn   { color: var(--a); }
+.mt-dim    { color: var(--t3); }
+.mt-num    { color: var(--c); font-weight: 500; }
+
+/* Chat bubbles */
+.chat-seq { display: flex; flex-direction: column; gap: 14px; }
+.cb {
+  display: flex; gap: 10px;
+}
+.cb.right { flex-direction: row-reverse; }
+.cb-av {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+.cb-av.ai  { background: linear-gradient(135deg, var(--p), var(--v)); color: #fff; }
+.cb-av.usr { background: rgba(255,255,255,0.1); border: 1px solid var(--b); color: var(--t2); font-size: 10px; }
+.cb-bub {
+  max-width: 80%;
+  padding: 10px 14px; border-radius: 12px;
+  font-size: 12.5px; line-height: 1.6;
+}
+.cb-bub.ai  {
+  background: rgba(94,106,210,0.1);
+  border: 1px solid rgba(94,106,210,0.2);
+  border-radius: 4px 12px 12px 12px; color: var(--t2);
+}
+.cb-bub.usr {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--b);
+  border-radius: 12px 4px 12px 12px; color: var(--t2);
+}
+.cb-bub strong { color: var(--t); font-weight: 500; }
+
+/* Metric card */
+.metric-card {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.mc-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--b);
+  border-radius: 10px;
+  padding: 16px;
+}
+.mc-val {
+  font-family: var(--fh); font-size: 26px; font-weight: 800;
+  line-height: 1; margin-bottom: 4px;
+}
+.mc-val.g { color: var(--g); }
+.mc-val.i { color: var(--p-l); }
+.mc-val.c { color: var(--c); }
+.mc-val.a { color: var(--a); }
+.mc-label { font-size: 11px; color: var(--t3); font-weight: 500; }
+
+/* ════════════════════════════════════════════════════
+   COMPARISON — Clean two-column
+════════════════════════════════════════════════════ */
+.comp-frame {
+  border: 1px solid var(--b);
+  border-radius: 16px; overflow: hidden;
+  margin-top: 64px;
+}
+.comp-head {
+  display: grid; grid-template-columns: 2fr 1fr 1fr;
+  padding: 14px 24px; border-bottom: 1px solid var(--b);
+  background: rgba(255,255,255,0.025);
+}
+.comp-h-label { font-size: 12px; font-weight: 600; color: var(--t3); }
+.comp-h-aiza {
+  text-align: center; font-size: 12px; font-weight: 700;
+  color: var(--p-l);
+  background: rgba(94,106,210,0.1);
+  border: 1px solid var(--b-i);
+  border-radius: 6px 6px 0 0; border-bottom: none;
+  padding: 5px 10px; margin: -5px -10px -14px;
+}
+.comp-h-other { text-align: center; font-size: 12px; color: var(--t3); }
+
+.comp-row {
+  display: grid; grid-template-columns: 2fr 1fr 1fr;
+  padding: 14px 24px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  align-items: center; font-size: 13.5px;
+  transition: background 0.15s;
+}
+.comp-row:last-child { border-bottom: none; }
+.comp-row:hover { background: rgba(255,255,255,0.02); }
+.comp-feat { color: var(--t2); }
+.comp-yes { text-align: center; color: var(--g); font-size: 16px; }
+.comp-no  { text-align: center; color: var(--t3); font-size: 13px; }
+.comp-aiza-c {
+  text-align: center;
+  background: rgba(94,106,210,0.05);
+  color: var(--p-l); padding: 2px 8px; border-radius: 6px;
+}
+
+/* ════════════════════════════════════════════════════
+   NICHOS — minimal grid
+════════════════════════════════════════════════════ */
+.niche-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 14px; margin-top: 52px;
+}
+.niche-card {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--b);
+  border-radius: 14px;
+  transition: all 0.25s var(--ease);
+  position: relative; overflow: hidden;
+}
+.niche-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(94,106,210,0.3), transparent);
+  opacity: 0; transition: opacity 0.25s;
+}
+.niche-card:hover { border-color: var(--b-i); transform: translateY(-2px); }
+.niche-card:hover::before { opacity: 1; }
+.niche-emoji { font-size: 26px; flex-shrink: 0; margin-top: 2px; }
+.niche-name  { font-family: var(--fh); font-size: 14px; font-weight: 700; color: var(--t); margin-bottom: 4px; }
+.niche-desc  { font-size: 12px; color: var(--t2); line-height: 1.6; }
+
+/* ════════════════════════════════════════════════════
+   FOUNDER
+════════════════════════════════════════════════════ */
+.founder-wrap {
+  display: grid; grid-template-columns: 200px 1fr;
+  gap: 72px; align-items: start;
+  margin-top: 64px;
+}
+.founder-left { text-align: center; }
+.founder-avatar {
+  width: 120px; height: 120px; border-radius: 50%;
+  margin: 0 auto 16px;
+  background: linear-gradient(135deg, var(--p), var(--v));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 52px;
+  border: 2px solid rgba(94,106,210,0.3);
+  box-shadow: 0 0 40px rgba(94,106,210,0.25);
+}
+.founder-name { font-family: var(--fh); font-size: 15px; font-weight: 700; color: var(--t); margin-bottom: 4px; }
+.founder-title { font-size: 11.5px; color: var(--p-l); font-weight: 500; }
+.founder-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--b), transparent);
+  margin: 16px auto 0;
+}
+
+.founder-quote {
+  font-family: var(--fh);
+  font-size: clamp(20px, 2.8vw, 30px);
+  font-weight: 700; line-height: 1.4;
+  color: var(--t); margin-bottom: 28px;
+  letter-spacing: -0.01em;
+}
+.founder-quote .hl {
+  background: linear-gradient(135deg, var(--p-l), var(--v));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.founder-story {
+  font-size: 15px; color: var(--t2); line-height: 1.85;
+  margin-bottom: 28px;
+}
+.founder-story strong { color: var(--t); font-weight: 600; }
+.founder-quotes { display: flex; flex-direction: column; gap: 10px; }
+.fq {
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid var(--b);
+  border-left: 2px solid rgba(94,106,210,0.5);
+  border-radius: 0 10px 10px 0;
+  font-size: 13.5px; color: var(--t2); font-style: italic; line-height: 1.65;
+}
+
+/* ════════════════════════════════════════════════════
+   PRICING
+════════════════════════════════════════════════════ */
+.pricing-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; margin-top: 64px; align-items: start;
+}
+.price-card {
+  background: var(--bg-3);
+  border: 1px solid var(--b);
+  border-radius: 16px;
+  padding: 32px;
+  position: relative;
+  transition: all 0.3s var(--ease);
+}
+.price-card:hover { transform: translateY(-3px); border-color: var(--b-h); }
+.price-card.pop {
+  border-color: var(--b-i);
+  background: linear-gradient(135deg, rgba(94,106,210,0.08), rgba(139,92,246,0.04));
+  box-shadow: 0 0 60px rgba(94,106,210,0.1), 0 24px 60px rgba(0,0,0,0.4);
+  transform: scale(1.02);
+}
+.price-card.pop:hover { transform: scale(1.02) translateY(-3px); }
+.pop-badge {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  padding: 3px 16px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--p), var(--v));
+  font-size: 10.5px; font-weight: 700; color: #fff;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(94,106,210,0.35);
+}
+.price-tier { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--t3); margin-bottom: 12px; }
+.price-name { font-family: var(--fh); font-size: 22px; font-weight: 800; color: var(--t); margin-bottom: 18px; }
+.price-name.grad {
+  background: linear-gradient(135deg, var(--p-l), var(--v));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.price-amount { display: flex; align-items: flex-start; gap: 3px; margin-bottom: 4px; }
+.price-cur { font-size: 16px; color: var(--t2); margin-top: 10px; }
+.price-val { font-family: var(--fh); font-size: 52px; font-weight: 800; line-height: 1; color: var(--t); }
+.price-val.colored {
+  background: linear-gradient(135deg, var(--p-l), var(--v));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.price-per { font-size: 12px; color: var(--t3); margin-bottom: 22px; }
+.price-desc { font-size: 13px; color: var(--t2); line-height: 1.65; margin-bottom: 22px; padding-bottom: 22px; border-bottom: 1px solid var(--b); }
+.price-feats { list-style: none; margin-bottom: 28px; display: flex; flex-direction: column; gap: 0; }
+.price-feats li {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 13px; color: var(--t2); line-height: 1.5;
+}
+.price-feats li:last-child { border-bottom: none; }
+.price-feats li::before { content:'✓'; color: var(--g); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.price-btn {
+  width: 100%; padding: 12px;
+  border-radius: 10px; font-size: 14px; font-weight: 600;
+  border: none; transition: all 0.25s var(--ease);
+}
+.price-btn-primary {
+  background: linear-gradient(135deg, var(--p), var(--v));
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(94,106,210,0.28);
+}
+.price-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(94,106,210,0.4); }
+.price-btn-ghost {
+  background: transparent; color: var(--t2);
+  border: 1px solid var(--b);
+}
+.price-btn-ghost:hover { border-color: var(--b-h); color: var(--t); }
+.savings-tag {
+  margin-top: 20px; padding: 14px;
+  background: rgba(34,197,94,0.06);
+  border: 1px solid rgba(34,197,94,0.12);
+  border-radius: 10px; text-align: center;
+}
+.savings-val { font-family: var(--fh); font-size: 20px; font-weight: 800; color: var(--g); }
+.savings-desc { font-size: 11.5px; color: var(--t2); margin-top: 3px; }
+
+/* ════════════════════════════════════════════════════
+   METRICS STRIP
+════════════════════════════════════════════════════ */
+.metrics-strip {
+  display: flex; align-items: center; justify-content: center;
+  gap: clamp(24px, 5vw, 80px); flex-wrap: wrap;
+  padding: 64px clamp(20px,5vw,80px);
+  border-top: 1px solid var(--b); border-bottom: 1px solid var(--b);
+}
+.metric { text-align: center; }
+.metric-val {
+  font-family: var(--fh); font-size: clamp(36px, 5vw, 56px);
+  font-weight: 800; line-height: 1;
+  background: linear-gradient(135deg, var(--t) 30%, var(--p-l));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+}
+.metric-label { font-size: 12px; color: var(--t3); }
+.metric-sep { width: 1px; height: 44px; background: var(--b); }
+
+/* ════════════════════════════════════════════════════
+   FINAL CTA
+════════════════════════════════════════════════════ */
+.cta-section {
+  padding: 140px clamp(20px,5vw,80px);
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 50% 50%, rgba(94,106,210,0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(6,182,212,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(139,92,246,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.cta-section::after {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 800px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--p), var(--v), transparent);
+  opacity: 0.3;
+}
+.cta-inner { position: relative; max-width: 680px; margin: 0 auto; }
+.cta-h2 {
+  font-family: var(--fh);
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1.06; margin-bottom: 22px; color: var(--t);
+}
+.cta-sub {
+  font-size: 18px; color: var(--t2); font-weight: 300;
+  line-height: 1.7; margin-bottom: 48px;
+}
+.cta-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+.btn-whats {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 14px 30px; font-size: 15px; font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: none; border-radius: 10px;
+  transition: all 0.25s var(--ease);
+  box-shadow: 0 8px 28px rgba(34,197,94,0.28);
+  text-decoration: none; font-family: var(--fb);
+}
+.btn-whats:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(34,197,94,0.4); }
+.btn-demo2 {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 13px 26px; font-size: 15px; font-weight: 500;
+  color: var(--t2); background: transparent;
+  border: 1px solid var(--b); border-radius: 10px;
+  transition: all 0.25s var(--ease); text-decoration: none;
+  font-family: var(--fb);
+}
+.btn-demo2:hover { border-color: var(--b-h); color: var(--t); }
+.cta-guarantees { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+.cta-g { font-size: 12.5px; color: var(--t3); display: flex; align-items: center; gap: 6px; }
+.cta-g::before { content: '·'; color: var(--p-l); }
+
+/* ════════════════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════════════════ */
+footer {
+  padding: 36px clamp(20px,5vw,80px);
+  border-top: 1px solid var(--b);
+  display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 16px;
+}
+.foot-logo { display: flex; align-items: center; gap: 9px; }
+.foot-logo-mark {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: linear-gradient(135deg, var(--p), var(--v));
+  display: flex; align-items: center; justify-content: center;
+}
+.foot-logo-mark svg { width: 14px; height: 14px; }
+.foot-logo-name { font-family: var(--fh); font-size: 15px; font-weight: 700; color: var(--t); }
+.foot-links { display: flex; gap: 20px; }
+.foot-links a { font-size: 12.5px; color: var(--t3); transition: color 0.2s; }
+.foot-links a:hover { color: var(--t2); }
+.foot-copy { font-size: 12px; color: var(--t3); }
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .feat-rows .feat-row { grid-template-columns: 1fr; gap: 32px; }
+  .feat-row.rev { direction: ltr; }
+  .feat-content, .feat-row.rev .feat-content { padding: 0; }
+  .founder-wrap { grid-template-columns: 1fr; gap: 40px; }
+  .founder-left { display: flex; gap: 20px; align-items: center; text-align: left; }
+  .founder-line { display: none; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .ba-grid { grid-template-columns: 1fr; }
+  .ba-col.after { border-left: none; border-top: 1px solid var(--b); }
+  .niche-grid { grid-template-columns: 1fr 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .price-card.pop { transform: none; }
+  .price-card.pop:hover { transform: translateY(-3px); }
+  .metrics-strip { gap: 24px; }
+  .metric-sep { display: none; }
+  .comp-head, .comp-row { grid-template-columns: 1.8fr 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .niche-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn-cta-lg, .btn-demo { text-align: center; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- AMBIENT -->
+<div class="ambient">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+<div class="grid-lines"></div>
+
+<div class="page">
+
+<!-- ════ NAV ════════════════════════════════════════════ -->
+<nav id="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M30 4 L54 56 L44 56 L30 22 L16 56 L6 56 Z" fill="white"/>
+        <path d="M30 22 L42 50 L18 50 Z" fill="#6366f1"/>
+        <rect x="6" y="36" width="48" height="7" fill="#6366f1"/>
+        <line x1="16" y1="39.5" x2="44" y2="39.5" stroke="white" stroke-width="5"/>
+      </svg>
+    </div>
+    <span class="nav-logo-name">Aiza AI</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#como-funciona">Como funciona</a></li>
+    <li><a href="#recursos">Recursos</a></li>
+    <li><a href="#precos">Preços</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-btn-ghost">Entrar</button>
+    <button class="nav-btn-cta">14 dias grátis</button>
+  </div>
+</nav>
+
+<!-- ════ HERO ════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span class="eyebrow-dot"></span>
+    IA Operacional · Novo
+  </div>
+
+  <h1 class="hero-h1">
+    <span class="hero-h1-line1">A empresa que</span>
+    <span class="hero-h1-line2">funciona sozinha.</span>
+  </h1>
+
+  <p class="hero-sub">
+    Aiza AI opera seu estoque, vendas e financeiro <strong>24 horas por dia</strong> —
+    sem você precisar olhar. Você só precisa crescer.
+  </p>
+
+  <div class="hero-actions">
+    <button class="btn-cta-lg">
+      Começar agora — grátis
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+    <button class="btn-demo">
+      Ver demonstração
+      <span class="btn-demo-arr">→</span>
+    </button>
+  </div>
+
+  <!-- AI STREAM VISUAL -->
+  <div class="hero-stream">
+    <div class="stream-shell">
+      <div class="stream-bar">
+        <div class="sdot sdot-r"></div>
+        <div class="sdot sdot-y"></div>
+        <div class="sdot sdot-g"></div>
+        <span class="stream-bar-label">aiza.ai — operações em tempo real</span>
+        <div class="live-pill">
+          <span class="live-dot"></span>
+          ao vivo
+        </div>
+      </div>
+      <div class="stream-body" id="stream-body">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ PROOF BAR ══════════════════════════════════════ -->
+<div class="proof-bar rv">
+  <div class="proof-item">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>14 dias grátis · Sem cartão</span>
+  </div>
+  <div class="proof-sep"></div>
+  <div class="proof-item">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span>Powered by Claude Anthropic</span>
+  </div>
+  <div class="proof-sep"></div>
+  <div class="proof-item">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span>Cancela quando quiser</span>
+  </div>
+  <div class="proof-sep"></div>
+  <div class="proof-item">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>Usuários ilimitados inclusos</span>
+  </div>
+</div>
+
+<!-- ════ NÚMEROS / GAP ══════════════════════════════════ -->
+<section class="s alt-bg">
+<div class="s-inner">
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;">
+    <div class="rv">
+      <span class="gap-number" id="gap-num">97%</span>
+      <div class="gap-label">dos lojistas ainda<br/>gerem tudo na mão.</div>
+      <p class="gap-sub">Sem IA. Sem automação. Sem dados em tempo real. O Brasil tem 21,7 milhões de negócios — e quase nenhum tem um sistema que realmente pensa por eles.</p>
+    </div>
+    <div class="rv d2">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="eyebrow">A oportunidade</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="padding:24px;background:var(--surface);border:1px solid var(--b);border-radius:14px;">
+            <div style="font-family:var(--fh);font-size:40px;font-weight:800;background:linear-gradient(135deg,var(--p-l),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:6px;">21,7M</div>
+            <div style="font-size:12px;color:var(--t3);">negócios no Brasil</div>
+          </div>
+          <div style="padding:24px;background:var(--surface);border:1px solid var(--b);border-radius:14px;">
+            <div style="font-family:var(--fh);font-size:40px;font-weight:800;background:linear-gradient(135deg,var(--a),var(--r));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:6px;">43%</div>
+            <div style="font-size:12px;color:var(--t3);">usam caderno ou planilha</div>
+          </div>
+          <div style="padding:24px;background:var(--surface);border:1px solid var(--b);border-radius:14px;">
+            <div style="font-family:var(--fh);font-size:40px;font-weight:800;color:var(--g);line-height:1;margin-bottom:6px;">R$0</div>
+            <div style="font-size:12px;color:var(--t3);">para começar hoje</div>
+          </div>
+          <div style="padding:24px;background:var(--surface);border:1px solid var(--b);border-radius:14px;">
+            <div style="font-family:var(--fh);font-size:40px;font-weight:800;background:linear-gradient(135deg,var(--v),var(--p-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:6px;">5min</div>
+            <div style="font-size:12px;color:var(--t3);">para configurar tudo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEFORE / AFTER -->
+  <div class="ba-grid rv">
+    <div class="ba-col before">
+      <span class="ba-tag r">Sem Aiza AI</span>
+      <ul class="ba-list">
+        <li class="ba-item r"><span class="ba-ico">✗</span>Você olha o estoque — está desatualizado</li>
+        <li class="ba-item r"><span class="ba-ico">✗</span>Produto acaba. Você descobre depois</li>
+        <li class="ba-item r"><span class="ba-ico">✗</span>Balanço mensal: 1 dia perdido com sua equipe</li>
+        <li class="ba-item r"><span class="ba-ico">✗</span>Suporte: 9 a 26 dias para uma resposta</li>
+        <li class="ba-item r"><span class="ba-ico">✗</span>Você decide o que repor — sem dados</li>
+        <li class="ba-item r"><span class="ba-ico">✗</span>Relatório financeiro: você monta na mão</li>
+        <li class="ba-item r"><span class="ba-ico">✗</span>IA: zero. Só você contra os problemas</li>
+      </ul>
+    </div>
+    <div class="ba-col after">
+      <span class="ba-tag b">Com Aiza AI</span>
+      <ul class="ba-list">
+        <li class="ba-item"><span class="ba-ico">✓</span>Estoque atualizado em tempo real, sempre</li>
+        <li class="ba-item"><span class="ba-ico">✓</span>IA avisa antes do produto acabar</li>
+        <li class="ba-item"><span class="ba-ico">✓</span>Relatório gerado todo dia 1, automaticamente</li>
+        <li class="ba-item"><span class="ba-ico">✓</span>IA resolve instantaneamente — 24h</li>
+        <li class="ba-item"><span class="ba-ico">✓</span>IA cria o pedido de reposição sozinha</li>
+        <li class="ba-item"><span class="ba-ico">✓</span>Relatório financeiro no seu WhatsApp</li>
+        <li class="ba-item"><span class="ba-ico">✓</span>IA trabalhando enquanto você dorme</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ════ FEATURES / AI ACTIONS ══════════════════════════ -->
+<section class="s" id="recursos">
+<div class="s-inner">
+  <div class="s-center rv">
+    <div class="eyebrow" style="justify-content:center">O que a Aiza faz por você</div>
+    <h2 class="s-h2">Menos você gerindo.<br/><span class="g">Mais IA operando.</span></h2>
+    <p class="s-sub">Cada funcionalidade foi desenhada para eliminar uma tarefa manual. Você define os objetivos — a Aiza executa.</p>
+  </div>
+
+  <div class="feat-rows" id="como-funciona">
+
+    <!-- Estoque -->
+    <div class="feat-row rv">
+      <div class="feat-content">
+        <div class="feat-label">estoque inteligente</div>
+        <h3 class="feat-h3">A IA que monitora e repõe sozinha.</h3>
+        <p class="feat-p">Controle por tamanho, cor e variante em tempo real. A IA identifica divergências, alerta antes do estoque zerar e cria o pedido de reposição automaticamente — sem você precisar perguntar.</p>
+        <span class="feat-badge">✓ Exclusivo Aiza AI</span>
+      </div>
+      <div class="feat-visual">
+        <div class="mini-term">
+          <div class="mt-line"><span class="mt-prompt">→</span><span class="mt-out">aiza.<span style="color:var(--p-l)">scanStock</span>() — em execução</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-dim">verificando 847 SKUs...</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-warn">⚠ Tênis Nike 42 → 2 unidades (crítico)</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-warn">⚠ Carregador USB-C → 1 unidade (crítico)</span></div>
+          <div class="mt-line"><span class="mt-prompt">→</span><span class="mt-out">aiza.<span style="color:var(--p-l)">createOrder</span>()</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-ok">✓ Pedido #2847 criado → Fornecedor notificado</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-ok">✓ Previsão de chegada: amanhã 14h</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IA Conversacional -->
+    <div class="feat-row rev rv d1">
+      <div class="feat-content">
+        <div class="feat-label">IA conversacional</div>
+        <h3 class="feat-h3">Pergunte. A Aiza age.</h3>
+        <p class="feat-p">Não é um chatbot que responde qualquer coisa. É uma IA treinada com os dados reais da sua loja. Você pergunta em linguagem natural — ela responde com dados precisos e executa ações no sistema.</p>
+        <span class="feat-badge" style="background:rgba(6,182,212,0.08);border-color:rgba(6,182,212,0.18);color:var(--c)">Powered by Claude Anthropic</span>
+      </div>
+      <div class="feat-visual">
+        <div class="chat-seq">
+          <div class="cb right">
+            <div class="cb-bub usr">Como tá meu estoque de calçados?</div>
+            <div class="cb-av usr">V</div>
+          </div>
+          <div class="cb">
+            <div class="cb-av ai">A</div>
+            <div class="cb-bub ai">Você tem <strong>47 pares</strong> em estoque. O 42 está crítico (2 unidades) — cria o pedido agora?<br/><br/>Maior giro: Tênis Air Max 38 (<strong>12 vendas esta semana</strong>).</div>
+          </div>
+          <div class="cb right">
+            <div class="cb-bub usr">Sim, repõe 20 pares do 42.</div>
+            <div class="cb-av usr">V</div>
+          </div>
+          <div class="cb">
+            <div class="cb-av ai">A</div>
+            <div class="cb-bub ai"><strong>✓ Pedido criado.</strong> Fornecedor notificado. Previsão: amanhã. Quer que eu avise o cliente que estava na lista de espera?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Relatório -->
+    <div class="feat-row rv d1">
+      <div class="feat-content">
+        <div class="feat-label">relatório mensal automático</div>
+        <h3 class="feat-h3">Todo dia 1. No seu WhatsApp. Automático.</h3>
+        <p class="feat-p">A IA analisa tudo que aconteceu no mês — o que vendeu, o que lucrou, onde você perdeu dinheiro — e entrega um relatório completo com o plano de ação para o próximo mês. Sem você pedir.</p>
+        <span class="feat-badge">✓ Exclusivo Aiza AI</span>
+      </div>
+      <div class="feat-visual">
+        <div class="metric-card">
+          <div class="mc-item">
+            <div class="mc-val g">R$47k</div>
+            <div class="mc-label">faturamento</div>
+          </div>
+          <div class="mc-item">
+            <div class="mc-val i">R$12k</div>
+            <div class="mc-label">lucro líquido</div>
+          </div>
+          <div class="mc-item">
+            <div class="mc-val c">↑ 34%</div>
+            <div class="mc-label">vs mês anterior</div>
+          </div>
+          <div class="mc-item">
+            <div class="mc-val a">8 itens</div>
+            <div class="mc-label">para repor hoje</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:12px 14px;background:rgba(94,106,210,0.08);border:1px solid var(--b-i);border-radius:10px;font-size:12px;color:var(--p-l);font-family:var(--fm);">
+          IA: "Seu maior risco este mês são 6 produtos parados com R$ 8.240 em capital. Sugiro liquidação de 20%."
+        </div>
+      </div>
+    </div>
+
+    <!-- Estrategista -->
+    <div class="feat-row rev rv d1">
+      <div class="feat-content">
+        <div class="feat-label">estrategista financeiro</div>
+        <h3 class="feat-h3">Capital preso<br/>é prejuízo silencioso.</h3>
+        <p class="feat-p">A IA classifica cada produto: estrela, encalhado ou margem baixa. Para cada um, ela diz exatamente o que fazer — promover, liquidar, aumentar preço ou repor mais. Decisões com dados, não com achismo.</p>
+        <span class="feat-badge">✓ Exclusivo Aiza AI</span>
+      </div>
+      <div class="feat-visual">
+        <div class="mini-term">
+          <div class="mt-line"><span class="mt-prompt">→</span><span class="mt-out">aiza.<span style="color:var(--p-l)">analyzeInventory</span>()</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-ok">⭐ Tênis Air Max: alta margem, alto giro → repor</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-warn">⏰ Bolsa Caramelo: 22 dias parada → liquidar</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-dim">   R$ 2.160 preso · desconto 20% = R$43 lucro</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-warn">📉 Camiseta Básica: margem 8% → ajustar preço</span></div>
+          <div class="mt-line"><span class="mt-prompt"> </span><span class="mt-ok">✓ Capital em risco: <span class="mt-num">R$ 8.240</span> (plano gerado)</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ════ COMPARATIVO ══════════════════════════════════════ -->
+<section class="s alt-bg">
+<div class="s-inner rv">
+  <div class="s-center">
+    <div class="eyebrow" style="justify-content:center">Por que Aiza AI</div>
+    <h2 class="s-h2">Tudo que os outros têm.<br/><span class="gv">Mais o que só nós temos.</span></h2>
+  </div>
+  <div class="comp-frame">
+    <div class="comp-head">
+      <div class="comp-h-label"></div>
+      <div class="comp-h-aiza">Aiza AI</div>
+      <div class="comp-h-other">Bling / UpGestão</div>
+    </div>
+    <div class="comp-row"><div class="comp-feat">PDV e controle de estoque</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-yes">✓</div></div>
+    <div class="comp-row"><div class="comp-feat">Emissão de NFC-e</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-yes">✓</div></div>
+    <div class="comp-row"><div class="comp-feat">IA que age e executa comandos</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-no">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Relatório mensal automático com IA</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-no">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Análise de taxas de maquininha</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-no">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Estrategista financeiro com IA</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-no">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Diagnóstico de saúde do negócio</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-no">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Suporte resolvido em minutos</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-no" style="color:var(--r);font-weight:600;">9–26 dias</div></div>
+    <div class="comp-row"><div class="comp-feat">Usuários ilimitados</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-no">—</div></div>
+    <div class="comp-row"><div class="comp-feat">Multi-loja com dados separados</div><div class="comp-yes comp-aiza-c">✓</div><div class="comp-no">—</div></div>
+    <div class="comp-row" style="font-weight:600">
+      <div class="comp-feat">Preço mensal</div>
+      <div class="comp-aiza-c" style="color:var(--g);font-weight:800;font-family:var(--fh)">R$ 79–247</div>
+      <div class="comp-no">R$ 200–349+</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ════ NICHOS ══════════════════════════════════════════ -->
+<section class="s">
+<div class="s-inner">
+  <div class="s-center rv">
+    <div class="eyebrow" style="justify-content:center">Para o seu negócio</div>
+    <h2 class="s-h2">Se adapta ao seu ramo.<br/><span class="g">Na primeira entrada.</span></h2>
+    <p class="s-sub">Selecione seu segmento e a Aiza configura tudo automaticamente. Fala a língua do seu ramo — sem configuração manual.</p>
+  </div>
+  <div class="niche-grid">
+    <div class="niche-card rv d1"><span class="niche-emoji">👗</span><div><div class="niche-name">Moda e Vestuário</div><div class="niche-desc">Grade P/M/G/GG, sazonalidade, coleção parada</div></div></div>
+    <div class="niche-card rv d2"><span class="niche-emoji">👟</span><div><div class="niche-name">Calçados</div><div class="niche-desc">Numeração 33–47, giro por número, reposição</div></div></div>
+    <div class="niche-card rv d3"><span class="niche-emoji">✂️</span><div><div class="niche-name">Barbearia</div><div class="niche-desc">Agenda por barbeiro, comissão, clube de assinatura</div></div></div>
+    <div class="niche-card rv d1"><span class="niche-emoji">💄</span><div><div class="niche-name">Cosméticos</div><div class="niche-desc">Validade, fragrâncias, fidelidade automática</div></div></div>
+    <div class="niche-card rv d2"><span class="niche-emoji">🛒</span><div><div class="niche-name">Mercadinho</div><div class="niche-desc">Perecíveis, giro diário, CMV por categoria</div></div></div>
+    <div class="niche-card rv d3"><span class="niche-emoji">📱</span><div><div class="niche-name">Eletrônicos</div><div class="niche-desc">Número de série, garantia, assistência técnica</div></div></div>
+    <div class="niche-card rv d1"><span class="niche-emoji">💇</span><div><div class="niche-name">Salão de Beleza</div><div class="niche-desc">Profissional, histórico de serviço, fidelização</div></div></div>
+    <div class="niche-card rv d2"><span class="niche-emoji">📚</span><div><div class="niche-name">Papelaria</div><div class="niche-desc">Volta às aulas, sazonalidade, mix amplo</div></div></div>
+    <div class="niche-card rv d3"><span class="niche-emoji">🏪</span><div><div class="niche-name">Outro negócio</div><div class="niche-desc">Sistema base + IA que aprende com seu histórico</div></div></div>
+  </div>
+</div>
+</section>
+
+<!-- ════ FUNDADOR ════════════════════════════════════════ -->
+<section class="s alt-bg">
+<div class="s-inner">
+  <div class="eyebrow rv">A história por trás</div>
+  <h2 class="s-h2 rv">Criado por quem<br/><span class="gv">viveu cada uma dessas dores.</span></h2>
+  <div class="founder-wrap">
+    <div class="founder-left rv">
+      <div class="founder-avatar">👨‍💼</div>
+      <div>
+        <div class="founder-name">Hamuda</div>
+        <div class="founder-title">Fundador · Aiza AI</div>
+        <div class="founder-line"></div>
+      </div>
+    </div>
+    <div class="rv d2">
+      <div class="founder-quote">
+        Tive mais de 5 lojas. Senti na pele <span class="hl">cada uma dessas dores</span>. Criei a Aiza porque eu sabia o que faltava.
+      </div>
+      <p class="founder-story">
+        Fui lojista por anos. Usava sistema de gestão como todo lojista. Confiava nos números. Tomava decisões baseado neles.<br/><br/>
+        <strong>Até descobrir que os números eram mentira — em todas as minhas lojas.</strong>
+      </p>
+      <div class="founder-quotes">
+        <div class="fq">📦 "Meu sistema dizia R$ 100k em mercadoria. Na realidade, R$ 40k. Decidi errado por meses."</div>
+        <div class="fq">🔋 "Toda semana: 60 carregadores no sistema, zero na prateleira. Venda perdida toda semana."</div>
+        <div class="fq">😰 "Cliente encomendou, colaborador esqueceu. Ele voltou animado — produto nunca foi pedido. Perdi o cliente."</div>
+        <div class="fq">💸 "R$ 40k em produto parado. Capital morto. Enquanto o mais vendido ficava sem estoque."</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ════ METRICS ══════════════════════════════════════════ -->
+<div class="metrics-strip rv">
+  <div class="metric">
+    <div class="metric-val" data-count="21" data-suffix=",7M">0</div>
+    <div class="metric-label">negócios no Brasil</div>
+  </div>
+  <div class="metric-sep"></div>
+  <div class="metric">
+    <div class="metric-val" data-count="97" data-suffix="%">0</div>
+    <div class="metric-label">sem IA na gestão</div>
+  </div>
+  <div class="metric-sep"></div>
+  <div class="metric">
+    <div class="metric-val" data-count="5" data-suffix=" min">0</div>
+    <div class="metric-label">para configurar</div>
+  </div>
+  <div class="metric-sep"></div>
+  <div class="metric">
+    <div class="metric-val" data-count="524" data-suffix="">0</div>
+    <div class="metric-label">novos negócios/dia no Brasil</div>
+  </div>
+</div>
+
+<!-- ════ PRICING ═════════════════════════════════════════ -->
+<section class="s" id="precos">
+<div class="s-inner">
+  <div class="s-center rv">
+    <div class="eyebrow" style="justify-content:center">Preços</div>
+    <h2 class="s-h2">Simples. Sem surpresa.<br/><span class="g">Cancela quando quiser.</span></h2>
+    <p class="s-sub">14 dias grátis em qualquer plano. Sem cartão. Usuários ilimitados inclusos em todos.</p>
+  </div>
+  <div class="pricing-grid">
+    <!-- Essencial -->
+    <div class="price-card rv d1">
+      <div class="price-tier">Essencial</div>
+      <div class="price-name">Starter</div>
+      <div class="price-amount">
+        <span class="price-cur">R$</span>
+        <span class="price-val">79</span>
+      </div>
+      <div class="price-per">/mês · sem contrato</div>
+      <p class="price-desc">Para quem está começando. Organização completa com IA básica.</p>
+      <ul class="price-feats">
+        <li>PDV completo com grade</li>
+        <li>Controle de estoque inteligente</li>
+        <li>Fluxo de caixa</li>
+        <li>Até 500 produtos</li>
+        <li>IA com alertas automáticos</li>
+        <li>Usuários ilimitados</li>
+        <li>Suporte por WhatsApp</li>
+      </ul>
+      <button class="price-btn price-btn-ghost">Começar grátis</button>
+    </div>
+
+    <!-- Pro -->
+    <div class="price-card pop rv d2">
+      <div class="pop-badge">⭐ Mais escolhido</div>
+      <div class="price-tier">Pro</div>
+      <div class="price-name grad">Pro</div>
+      <div class="price-amount">
+        <span class="price-cur" style="color:var(--p-l)">R$</span>
+        <span class="price-val colored">147</span>
+      </div>
+      <div class="price-per">/mês · sem contrato</div>
+      <p class="price-desc">Para quem quer crescer com inteligência e decisões baseadas em dados reais.</p>
+      <ul class="price-feats">
+        <li>Tudo do Starter</li>
+        <li>IA completa — age e executa</li>
+        <li>Relatório mensal automático</li>
+        <li>Análise de maquininhas</li>
+        <li>CRM de clientes completo</li>
+        <li>Central de pedidos</li>
+        <li>Scanner de produtos com IA</li>
+        <li>Emissão NFC-e inclusa</li>
+        <li>Produtos ilimitados</li>
+        <li>Diagnóstico de saúde do negócio</li>
+      </ul>
+      <button class="price-btn price-btn-primary">Começar grátis →</button>
+    </div>
+
+    <!-- Elite -->
+    <div class="price-card rv d3">
+      <div class="price-tier">Elite</div>
+      <div class="price-name">Multi-loja</div>
+      <div class="price-amount">
+        <span class="price-cur">R$</span>
+        <span class="price-val">247</span>
+      </div>
+      <div class="price-per">/mês · sem contrato</div>
+      <p class="price-desc">Para quem tem múltiplas lojas e precisa de dados separados por unidade.</p>
+      <ul class="price-feats">
+        <li>Tudo do Pro</li>
+        <li>Até 3 lojas com dados separados</li>
+        <li>Relatório por loja + consolidado</li>
+        <li>Comparativo entre lojas</li>
+        <li>Transferência de estoque</li>
+        <li>Assistente IA por WhatsApp</li>
+        <li>Migração automática (Bling/Omie)</li>
+        <li>Gerente de conta dedicado</li>
+      </ul>
+      <button class="price-btn price-btn-ghost">Falar com consultor</button>
+      <div class="savings-tag">
+        <div class="savings-val">Economize R$ 653/mês</div>
+        <div class="savings-desc">vs 2 sistemas separados que não integram</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ════ CTA FINAL ════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="cta-inner rv">
+    <h2 class="cta-h2">Seu sistema atual<br/>ficou velho hoje.</h2>
+    <p class="cta-sub">14 dias grátis. Sem cartão. Começa em 5 minutos.<br/>A Aiza começa a trabalhar por você amanhã de manhã.</p>
+    <div class="cta-buttons">
+      <a href="#" class="btn-whats">💬 Falar no WhatsApp</a>
+      <a href="#" class="btn-demo2">Ver o sistema ao vivo →</a>
+    </div>
+    <div class="cta-guarantees">
+      <span class="cta-g">14 dias grátis · sem cartão</span>
+      <span class="cta-g">Usuários ilimitados</span>
+      <span class="cta-g">Suporte em minutos</span>
+      <span class="cta-g">Cancela quando quiser</span>
+      <span class="cta-g">IA 24h incluída</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FOOTER ═══════════════════════════════════════════ -->
+<footer>
+  <div class="foot-logo">
+    <div class="foot-logo-mark">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
+        <path d="M30 4 L54 56 L44 56 L30 22 L16 56 L6 56 Z" fill="white"/>
+        <path d="M30 22 L42 50 L18 50 Z" fill="#5e6ad2"/>
+        <rect x="6" y="36" width="48" height="7" fill="#5e6ad2"/>
+        <line x1="16" y1="39.5" x2="44" y2="39.5" stroke="white" stroke-width="5"/>
+      </svg>
+    </div>
+    <span class="foot-logo-name">Aiza AI</span>
+  </div>
+  <div class="foot-links">
+    <a href="#">Privacidade</a>
+    <a href="#">Termos</a>
+    <a href="#">LGPD</a>
+    <a href="#">Status</a>
+  </div>
+  <div class="foot-copy">© 2026 Aiza AI · Feito no Brasil 🇧🇷</div>
+</footer>
+
+</div><!-- /page -->
+
+<script>
+/* ── NAV SCROLL ──────────────────────────────────────── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', scrollY > 30);
+}, { passive: true });
+
+/* ── REVEAL ON SCROLL ────────────────────────────────── */
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('on'); ro.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+document.querySelectorAll('.rv').forEach(el => ro.observe(el));
+
+/* ── COUNTER ─────────────────────────────────────────── */
+const co = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseFloat(el.dataset.count);
+    const suffix = el.dataset.suffix || '';
+    const dur = 1600;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const val = target < 10 ? (ease * target).toFixed(1) : Math.round(ease * target);
+      el.textContent = val + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    co.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => co.observe(el));
+
+/* ── AI STREAM ───────────────────────────────────────── */
+const streamData = [
+  { time: '03:47', icon: '⚠', text: '<span class="hl">Tênis Nike 42</span> — <span class="warn">2 unidades restantes</span>. Reposição necessária.', delay: 400 },
+  { time: '03:47', icon: '✓', text: 'Pedido de reposição criado → <span class="act">fornecedor notificado automaticamente</span>.', delay: 1200 },
+  { time: '03:48', icon: '✓', text: 'Caixa fechado — Faturamento: <span class="num">R$ 4.892</span> · Lucro: <span class="num">R$ 1.247</span>', delay: 2200 },
+  { time: '03:48', icon: '→', text: '<span class="act">Relatório do dia enviado para seu WhatsApp.</span>', delay: 3000 },
+  { time: '03:49', icon: '·', text: 'Analisando giro dos últimos 30 dias<span id="dots">...</span>', delay: 3900 },
+  { time: '03:49', icon: '✓', text: '<span class="num">8 produtos</span> com alta demanda. <span class="act">Lista de reposição gerada.</span>', delay: 5000 },
+  { time: '03:50', icon: '⚠', text: '<span class="hl">Bolsa Caramelo</span>: <span class="warn">22 dias parada</span>, R$ 2.160 parado. Desconto 20% sugerido.', delay: 6000 },
+  { time: '03:50', icon: '→', text: 'Mensagem de aniversário agendada — <span class="act">Cliente Fernanda, amanhã.</span>', delay: 7200 },
+];
+
+const body = document.getElementById('stream-body');
+
+function renderStream() {
+  body.innerHTML = '';
+  streamData.forEach((item, i) => {
+    const line = document.createElement('div');
+    line.className = 'stream-line';
+    line.innerHTML = `
+      <span class="stream-time">${item.time}</span>
+      <span class="stream-icon">${item.icon}</span>
+      <span class="stream-text">${item.text}</span>
+    `;
+    body.appendChild(line);
+    setTimeout(() => { line.classList.add('visible'); }, item.delay);
+  });
+  // Cursor line
+  setTimeout(() => {
+    const cur = document.createElement('div');
+    cur.className = 'stream-line visible';
+    cur.innerHTML = `<span class="stream-time"></span><span class="stream-icon"></span><span class="stream-text" style="color:var(--t3)">aiza está operando sua loja agora<span class="stream-cursor"></span></span>`;
+    body.appendChild(cur);
+  }, 8400);
+}
+renderStream();
+// Loop
+setInterval(() => {
+  body.querySelectorAll('.stream-line').forEach(l => {
+    l.classList.remove('visible');
+    l.style.opacity = '0';
+  });
+  setTimeout(() => renderStream(), 600);
+}, 12000);
+</script>
+
+</body>
+</html>
