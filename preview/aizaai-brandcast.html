@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aiza AI — Sua empresa finalmente organizada.</title>
+    <meta name="description" content="Uma inteligência operacional para lojistas brasileiros. Sua empresa finalmente organizada.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #000;
+            --bg-2: #05050e;
+            --card: #0c0c1a;
+            --card-2: #0f0f1f;
+            --accent: #0047ff;
+            --accent-2: #3a6fff;
+            --accent-dim: rgba(0, 71, 255, 0.18);
+            --accent-glow: rgba(0, 71, 255, 0.28);
+            --t: #f2f2f5;
+            --t2: #7a7a8a;
+            --t3: #2e2e3e;
+            --t4: #1a1a28;
+            --border: rgba(255, 255, 255, 0.055);
+            --border-s: rgba(255, 255, 255, 0.12);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Dot texture */
+        html::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.85) 1px, transparent 0);
+            background-size: 28px 28px;
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--t);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            color: #fff;
+            background: var(--accent);
+        }
+
+        body::-webkit-scrollbar { width: 5px; }
+        body::-webkit-scrollbar-track { background: var(--bg); }
+        body::-webkit-scrollbar-thumb {
+            background-image: linear-gradient(180deg, var(--accent), var(--accent-2));
+            border-radius: 20px;
+        }
+
+        /* Cursor */
+        .cursor-inner {
+            position: fixed;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #fff;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+            transition: opacity 0.15s;
+        }
+
+        .cursor-outer {
+            position: fixed;
+            width: 38px; height: 38px;
+            border: 1.5px solid rgba(0, 71, 255, 0.55);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.15s ease, border-color 0.2s, opacity 0.15s;
+        }
+
+        /* Scroll animations */
+        .sb {
+            filter: blur(2px);
+            opacity: 0 !important;
+            transform: translateY(64px) !important;
+            transition: opacity 1s ease, filter 1s ease, transform 1s ease !important;
+        }
+        .sb.on {
+            opacity: 1 !important;
+            filter: blur(0) !important;
+            transform: translateY(0) !important;
+        }
+        .sb.d1 { transition-delay: 0.05s !important; }
+        .sb.d2 { transition-delay: 0.12s !important; }
+        .sb.d3 { transition-delay: 0.2s !important; }
+        .sb.d4 { transition-delay: 0.3s !important; }
+        .sb.d5 { transition-delay: 0.42s !important; }
+
+        /* Hero keyframe */
+        @keyframes riseIn {
+            from { opacity: 0; filter: blur(8px); transform: translateY(72px); }
+            to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
+        }
+
+        /* Gradient text */
+        .deg {
+            background: radial-gradient(120% 140% at 50% 30%, #ffffff 0%, #9898a8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Animated blue text */
+        .anim-blue {
+            background-image: linear-gradient(45deg, #a8c4ff, #6699ff, #0047ff, #003ad4);
+            background-size: 400% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: moveBg 4s 0.5s infinite alternate ease-in-out;
+        }
+        @keyframes moveBg {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* ─── NAV ─────────────────────────────────────────────── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 800;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 52px;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            background: rgba(0,0,0,0.45);
+            transition: border-color 0.3s;
+        }
+
+        .logo {
+            font-family: 'Inter', sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .logo-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            margin-left: 1px;
+            margin-bottom: 8px;
+            display: inline-block;
+            animation: pulseDot 2.4s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.45; transform: scale(0.75); }
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 36px;
+        }
+
+        .nav-center a {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--t2);
+            text-decoration: none;
+            transition: color 0.2s;
+            letter-spacing: 0.01em;
+        }
+
+        .nav-center a:hover { color: var(--t); }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-link-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--t2);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 0;
+            transition: color 0.2s;
+        }
+
+        .nav-link-btn:hover { color: var(--t); }
+
+        .btn-sm {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            background: var(--accent);
+            border: none;
+            cursor: pointer;
+            padding: 9px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.18s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 0 1px rgba(0,71,255,0.25);
+        }
+
+        .btn-sm:hover {
+            background: #1557ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0,71,255,0.35);
+        }
+
+        /* ─── ANNOUNCEMENT ───────────────────────────────────── */
+        .announcement {
+            background: rgba(0, 47, 180, 0.07);
+            border-bottom: 1px solid rgba(0, 71, 255, 0.12);
+            padding: 11px 52px;
+            text-align: center;
+            font-size: 12.5px;
+            color: rgba(120, 160, 255, 0.85);
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        .announcement a {
+            color: rgba(160, 195, 255, 0.9);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(100,150,255,0.3);
+            padding-bottom: 1px;
+            margin-left: 8px;
+            transition: color 0.2s;
+        }
+        .announcement a:hover { color: #fff; }
+
+        /* ─── CONTAINER ──────────────────────────────────────── */
+        .wrap {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 52px;
+        }
+
+        section { position: relative; }
+
+        /* ─── HERO ───────────────────────────────────────────── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 130px 52px 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Radial glow */
+        .hero::after {
+            content: "";
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 71, 255, 0.1) 0%, transparent 68%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Subtle grid lines */
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 80px 80px;
+            background-position: center center;
+            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero > * { position: relative; z-index: 1; }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px 5px 8px;
+            border-radius: 100px;
+            border: 1px solid rgba(0, 71, 255, 0.28);
+            background: rgba(0, 47, 200, 0.07);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(120, 165, 255, 0.9);
+            margin-bottom: 38px;
+            animation: riseIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .badge-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+
+        .hero h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(44px, 6.5vw, 88px);
+            font-weight: 800;
+            line-height: 1.0;
+            letter-spacing: -0.045em;
+            max-width: 960px;
+            margin-bottom: 30px;
+            animation: riseIn 0.9s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .hero-sub {
+            font-size: clamp(15px, 1.5vw, 18px);
+            line-height: 1.8;
+            color: var(--t2);
+            max-width: 520px;
+            margin-bottom: 52px;
+            animation: riseIn 0.9s 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .hero-ctas {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            animation: riseIn 0.9s 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .btn-hero {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            background: var(--accent);
+            border: none;
+            cursor: pointer;
+            padding: 14px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 32px rgba(0,71,255,0.3), inset 0 0 10px rgba(255,255,255,0.08);
+        }
+
+        .btn-hero:hover {
+            background: #1154ff;
+            transform: translateY(-2px);
+            box-shadow: 0 0 48px rgba(0,71,255,0.42), inset 0 0 12px rgba(255,255,255,0.1);
+        }
+
+        .btn-hero svg { transition: transform 0.2s; }
+        .btn-hero:hover svg { transform: translateX(2px); }
+
+        .btn-ghost-lg {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--t2);
+            background: transparent;
+            border: 1px solid var(--border-s);
+            cursor: pointer;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-ghost-lg:hover {
+            color: var(--t);
+            border-color: rgba(255,255,255,0.22);
+            transform: translateY(-2px);
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            animation: riseIn 0.9s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 44px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .scroll-line::after {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.5), transparent);
+            animation: scrollDrop 2.2s ease-in-out infinite;
+        }
+
+        @keyframes scrollDrop {
+            0%   { top: -100%; }
+            100% { top: 200%; }
+        }
+
+        .scroll-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--t3);
+        }
+
+        /* ─── DOR ────────────────────────────────────────────── */
+        .section-dor {
+            padding: 160px 0 140px;
+            border-top: 1px solid var(--border);
+        }
+
+        .eyebrow {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--t3);
+            margin-bottom: 22px;
+            display: block;
+        }
+
+        .section-dor h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(42px, 5.5vw, 76px);
+            font-weight: 800;
+            letter-spacing: -0.045em;
+            line-height: 1.0;
+            margin-bottom: 56px;
+        }
+
+        .dor-body {
+            max-width: 580px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .dor-body p {
+            font-size: 17px;
+            line-height: 1.85;
+            color: var(--t2);
+        }
+
+        .dor-body p strong {
+            color: var(--t);
+            font-weight: 600;
+        }
+
+        /* ─── MARQUEE ────────────────────────────────────────── */
+        .section-marquee {
+            padding: 52px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-2);
+            overflow: hidden;
+        }
+
+        .marquee-wrap {
+            display: flex;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 0;
+            flex-shrink: 0;
+            animation: marquee 28s linear infinite;
+        }
+
+        .marquee-track2 {
+            display: flex;
+            gap: 0;
+            flex-shrink: 0;
+            animation: marquee 28s linear infinite;
+        }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-100%); }
+        }
+
+        .mq-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 18px;
+            padding: 0 32px;
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--t3);
+        }
+
+        .mq-sep {
+            width: 3px; height: 3px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+            opacity: 0.6;
+        }
+
+        /* ─── REFRAME ────────────────────────────────────────── */
+        .section-reframe {
+            padding: 160px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .section-reframe h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(36px, 4.5vw, 64px);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            margin-bottom: 32px;
+        }
+
+        .reframe-divider {
+            width: 1px;
+            height: 64px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent);
+            margin: 52px auto;
+        }
+
+        .reframe-sub {
+            max-width: 560px;
+            margin: 0 auto;
+            font-size: 18px;
+            line-height: 1.8;
+            color: var(--t2);
+        }
+
+        .reframe-sub strong {
+            color: var(--t);
+            font-weight: 600;
+            display: block;
+            font-size: 19px;
+            margin-bottom: 16px;
+        }
+
+        /* ─── APRESENTAÇÃO ───────────────────────────────────── */
+        .section-intro {
+            padding: 160px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .intro-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            align-items: start;
+        }
+
+        .intro-left h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(36px, 4vw, 58px);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            margin-bottom: 28px;
+        }
+
+        .intro-left p {
+            font-size: 17px;
+            line-height: 1.85;
+            color: var(--t2);
+            margin-bottom: 20px;
+        }
+
+        .intro-quote {
+            margin-top: 36px;
+            padding: 20px 24px;
+            border-left: 2px solid rgba(0, 71, 255, 0.4);
+            background: var(--accent-dim);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .intro-quote p {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            line-height: 1.7;
+            color: rgba(160, 190, 255, 0.75);
+            font-style: italic;
+            margin: 0 !important;
+        }
+
+        .intro-right {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 8px;
+        }
+
+        /* Feature cards */
+        .fx {
+            position: relative;
+            padding: 24px 28px;
+            border-radius: 10px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: border-color 0.4s ease;
+            cursor: default;
+        }
+
+        .fx::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            background: linear-gradient(135deg, rgba(0,71,255,0.25), transparent 60%) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .fx::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, rgba(0,71,255,0.07) 0%, rgba(0,50,200,0.04) 100%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .fx:hover {
+            border-color: rgba(0, 71, 255, 0.22);
+        }
+
+        .fx:hover::before,
+        .fx:hover::after {
+            opacity: 1;
+        }
+
+        .fx-before {
+            font-family: 'Inter', sans-serif;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--t3);
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .fx-after {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--t);
+            line-height: 1.55;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ─── CENTRAL PHRASE ─────────────────────────────────── */
+        .section-phrase {
+            padding: 100px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .phrase-text {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(36px, 5.5vw, 80px);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.0;
+            white-space: nowrap;
+        }
+
+        /* ─── JARVIS ─────────────────────────────────────────── */
+        .section-jarvis {
+            padding: 160px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .section-jarvis h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(34px, 4vw, 58px);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.08;
+            max-width: 760px;
+            margin: 0 auto 64px;
+        }
+
+        .jarvis-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            max-width: 920px;
+            margin: 0 auto;
+        }
+
+        .jc {
+            padding: 44px 36px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            text-align: left;
+            position: relative;
+            transition: background 0.35s;
+        }
+
+        .jc:last-child { border-right: none; }
+
+        .jc:hover {
+            background: var(--card-2);
+        }
+
+        .jc-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            margin-bottom: 18px;
+        }
+
+        .jc h3 {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--t);
+            margin-bottom: 12px;
+        }
+
+        .jc p {
+            font-size: 14px;
+            line-height: 1.75;
+            color: var(--t2);
+        }
+
+        /* ─── FUNDADOR ───────────────────────────────────────── */
+        .section-fundador {
+            padding: 160px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .fundador-inner {
+            max-width: 660px;
+        }
+
+        .fundador-quote {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(18px, 2vw, 24px);
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1.6;
+            letter-spacing: -0.015em;
+            color: var(--t);
+            margin-bottom: 44px;
+            padding: 28px 32px;
+            border: 1px solid var(--border-s);
+            border-left: 2px solid var(--accent);
+            border-radius: 0 10px 10px 0;
+            background: var(--card);
+            position: relative;
+        }
+
+        .fundador-quote::before {
+            content: "\201C";
+            position: absolute;
+            top: 8px;
+            left: 24px;
+            font-family: Georgia, serif;
+            font-size: 56px;
+            color: rgba(0, 71, 255, 0.2);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .fundador-body {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .fundador-body p {
+            font-size: 16px;
+            line-height: 1.85;
+            color: var(--t2);
+        }
+
+        .fundador-body p strong {
+            color: var(--t);
+            font-weight: 600;
+        }
+
+        /* ─── CTA ────────────────────────────────────────────── */
+        .section-cta {
+            padding: 160px 0 140px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-glow-bg {
+            position: absolute;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 900px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(0,71,255,0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .section-cta h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(42px, 5.5vw, 80px);
+            font-weight: 800;
+            letter-spacing: -0.045em;
+            line-height: 1.0;
+            max-width: 800px;
+            margin: 0 auto 24px;
+        }
+
+        .cta-trial {
+            font-size: 16.5px;
+            color: var(--t2);
+            margin-bottom: 10px;
+        }
+
+        .cta-guarantee {
+            font-size: 14px;
+            color: var(--t3);
+            margin-bottom: 56px;
+        }
+
+        .cta-trust {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin-top: 52px;
+        }
+
+        .trust-item {
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            color: var(--t3);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .trust-check {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 71, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .trust-check svg {
+            width: 8px; height: 8px;
+        }
+
+        /* Price callout */
+        .price-callout {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 24px;
+            border-radius: 10px;
+            border: 1px solid var(--border-s);
+            background: var(--card);
+            margin-bottom: 40px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .price-main {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--t);
+        }
+
+        .price-sub {
+            font-size: 12.5px;
+            color: var(--t2);
+        }
+
+        .price-divider {
+            width: 1px;
+            height: 28px;
+            background: var(--border-s);
+        }
+
+        /* ─── FOOTER ─────────────────────────────────────────── */
+        footer {
+            padding: 40px 52px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .footer-logo {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            color: var(--t2);
+        }
+
+        .footer-logo span { color: var(--accent); }
+
+        .footer-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .footer-links a {
+            font-size: 12.5px;
+            color: var(--t3);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--t2); }
+
+        .footer-right {
+            font-size: 12px;
+            color: var(--t3);
+        }
+
+        /* ─── RESPONSIVE ─────────────────────────────────────── */
+        @media (max-width: 900px) {
+            nav { padding: 0 24px; }
+            .nav-center { display: none; }
+            .hero { padding: 130px 24px 90px; }
+            .wrap { padding: 0 24px; }
+            .intro-layout { grid-template-columns: 1fr; gap: 64px; }
+            .jarvis-grid { grid-template-columns: 1fr; }
+            .jc { border-right: none; border-bottom: 1px solid var(--border); }
+            .jc:last-child { border-bottom: none; }
+            .phrase-text { white-space: normal; font-size: clamp(32px, 8vw, 56px); }
+            footer { flex-direction: column; text-align: center; }
+            .footer-links { flex-wrap: wrap; justify-content: center; }
+            .announcement { padding: 11px 24px; }
+        }
+
+        @media (max-width: 600px) {
+            .hero-ctas { flex-direction: column; width: 100%; }
+            .btn-hero, .btn-ghost-lg { width: 100%; justify-content: center; }
+            .price-callout { flex-direction: column; gap: 12px; }
+            .price-divider { width: 100%; height: 1px; }
+            .cta-trust { gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor (desktop) -->
+    <div class="cursor-inner" id="cI"></div>
+    <div class="cursor-outer" id="cO"></div>
+
+    <!-- Announcement bar -->
+    <div class="announcement">
+        Inteligência operacional para o seu negócio.
+        <a href="#cta">14 dias grátis, sem cartão →</a>
+    </div>
+
+    <!-- NAV -->
+    <nav id="nav">
+        <a href="#" class="logo">
+            aiza<span class="logo-dot"></span>
+        </a>
+        <div class="nav-center">
+            <a href="#sobre">Como funciona</a>
+            <a href="#recursos">O que faz</a>
+            <a href="#historia">Nossa história</a>
+        </div>
+        <div class="nav-right">
+            <button class="nav-link-btn">Entrar</button>
+            <a href="#cta" class="btn-sm">
+                Começar grátis
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ── HERO ─────────────────────────────────────────────── -->
+    <section class="hero">
+        <div class="hero-grid"></div>
+
+        <div class="hero-badge">
+            <span class="badge-dot"></span>
+            Inteligência operacional para lojistas
+        </div>
+
+        <h1 class="deg">
+            Você sente que sua empresa<br>depende demais de você?
+        </h1>
+
+        <p class="hero-sub">
+            Mensagens esquecidas. Informações espalhadas. Decisões no escuro.
+            A sensação de apagar incêndios o dia inteiro virou rotina.
+        </p>
+
+        <div class="hero-ctas">
+            <a href="#cta" class="btn-hero">
+                Conhecer a Aiza
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            <a href="#sobre" class="btn-ghost-lg">
+                Ver como funciona
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 2v10M2 7l5 5 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </div>
+
+        <div class="hero-scroll">
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ── DOR ───────────────────────────────────────────────── -->
+    <section class="section-dor" id="sobre">
+        <div class="wrap">
+            <span class="eyebrow sb">O diagnóstico</span>
+            <h2 class="sb d1">
+                <span class="deg">A cabeça<br>nunca desliga.</span>
+            </h2>
+            <div class="dor-body">
+                <p class="sb d2">Você sai do trabalho mas <strong>continua pensando na operação</strong>.</p>
+                <p class="sb d3">A sensação é que, se você parar um dia, <strong>tudo desmorona</strong>.</p>
+                <p class="sb d4">O negócio cresce… mas a <strong>desorganização cresce junto</strong>.</p>
+                <p class="sb d5">Sua empresa começou a depender <strong>da sua memória</strong>.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── MARQUEE ────────────────────────────────────────────── -->
+    <section class="section-marquee">
+        <div class="marquee-wrap">
+            <div class="marquee-track" id="mt1">
+                <span class="mq-item"><span class="mq-sep"></span>Clareza operacional</span>
+                <span class="mq-item"><span class="mq-sep"></span>Controle real</span>
+                <span class="mq-item"><span class="mq-sep"></span>Leveza operacional</span>
+                <span class="mq-item"><span class="mq-sep"></span>Antecipação</span>
+                <span class="mq-item"><span class="mq-sep"></span>Tranquilidade</span>
+                <span class="mq-item"><span class="mq-sep"></span>Presença inteligente</span>
+                <span class="mq-item"><span class="mq-sep"></span>Organização real</span>
+                <span class="mq-item"><span class="mq-sep"></span>Decisões no momento certo</span>
+            </div>
+            <div class="marquee-track" id="mt2" aria-hidden="true">
+                <span class="mq-item"><span class="mq-sep"></span>Clareza operacional</span>
+                <span class="mq-item"><span class="mq-sep"></span>Controle real</span>
+                <span class="mq-item"><span class="mq-sep"></span>Leveza operacional</span>
+                <span class="mq-item"><span class="mq-sep"></span>Antecipação</span>
+                <span class="mq-item"><span class="mq-sep"></span>Tranquilidade</span>
+                <span class="mq-item"><span class="mq-sep"></span>Presença inteligente</span>
+                <span class="mq-item"><span class="mq-sep"></span>Organização real</span>
+                <span class="mq-item"><span class="mq-sep"></span>Decisões no momento certo</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── REFRAME ────────────────────────────────────────────── -->
+    <section class="section-reframe">
+        <div class="wrap">
+            <span class="eyebrow sb">A virada</span>
+            <h2 class="sb d1">
+                <span class="deg">Talvez o problema<br>não seja sua equipe.</span>
+            </h2>
+            <div class="reframe-divider sb d2"></div>
+            <p class="reframe-sub sb d3">
+                <strong class="anim-blue">Talvez sua empresa simplesmente esteja operando sem inteligência.</strong>
+                Não é falta de esforço. É falta de clareza.<br>
+                E clareza se constrói com as informações certas,<br>no momento certo.
+            </p>
+        </div>
+    </section>
+
+    <!-- ── APRESENTAÇÃO ───────────────────────────────────────── -->
+    <section class="section-intro" id="recursos">
+        <div class="wrap">
+            <div class="intro-layout">
+                <div class="intro-left">
+                    <span class="eyebrow sb">A solução</span>
+                    <h2 class="sb d1">
+                        <span class="deg">Conheça<br>a Aiza.</span>
+                    </h2>
+                    <p class="sb d2">Uma inteligência operacional criada para acompanhar sua empresa junto com você.</p>
+                    <p class="sb d3" style="color: var(--t3); font-size: 15px;">
+                        Ela não é um sistema. Ela é uma presença — que observa, organiza e antecipa, enquanto você cuida do que importa.
+                    </p>
+                    <div class="intro-quote sb d4">
+                        <p>"Enquanto todos colocaram IA dentro do ERP... a Aiza colocou o ERP dentro da IA."</p>
+                    </div>
+                </div>
+
+                <div class="intro-right">
+                    <div class="fx sb d1">
+                        <p class="fx-before">estoque</p>
+                        <p class="fx-after">Pare de descobrir problemas tarde demais.</p>
+                    </div>
+                    <div class="fx sb d2">
+                        <p class="fx-before">fluxo de caixa</p>
+                        <p class="fx-after">Saiba exatamente para onde seu dinheiro está indo.</p>
+                    </div>
+                    <div class="fx sb d3">
+                        <p class="fx-before">clientes</p>
+                        <p class="fx-after">Nenhum cliente esquecido.</p>
+                    </div>
+                    <div class="fx sb d4">
+                        <p class="fx-before">notas fiscais</p>
+                        <p class="fx-after">Fiscal resolvido. Você não precisa pensar nisso.</p>
+                    </div>
+                    <div class="fx sb d5">
+                        <p class="fx-before">relatórios</p>
+                        <p class="fx-after">Seu contador recebe tudo organizado. Sem você precisar enviar nada.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FRASE CENTRAL ──────────────────────────────────────── -->
+    <section class="section-phrase">
+        <div class="wrap">
+            <p class="phrase-text deg sb">Sua empresa finalmente organizada.</p>
+        </div>
+    </section>
+
+    <!-- ── EFEITO JARVIS ──────────────────────────────────────── -->
+    <section class="section-jarvis">
+        <div class="wrap">
+            <span class="eyebrow sb">Efeito Jarvis</span>
+            <h2 class="sb d1">
+                <span class="deg">Como se existisse uma equipe inteligente<br>funcionando junto com você.</span>
+            </h2>
+
+            <div class="jarvis-grid sb d2">
+                <div class="jc">
+                    <p class="jc-num">01</p>
+                    <h3>Acompanha em tempo real</h3>
+                    <p>A Aiza monitora sua operação continuamente. Você não precisa verificar nada — ela já está de olho.</p>
+                </div>
+                <div class="jc">
+                    <p class="jc-num">02</p>
+                    <h3>Identifica antes do caos</h3>
+                    <p>Ela reconhece problemas antes que virem incêndios. Antecipação em vez de reação.</p>
+                </div>
+                <div class="jc">
+                    <p class="jc-num">03</p>
+                    <h3>Você só confirma</h3>
+                    <p>Quando precisa agir, ela já preparou a solução. Sua única tarefa é decidir.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FUNDADOR ───────────────────────────────────────────── -->
+    <section class="section-fundador" id="historia">
+        <div class="wrap">
+            <div class="fundador-inner">
+                <span class="eyebrow sb">A história</span>
+                <blockquote class="fundador-quote sb d1">
+                    "Trabalhei anos numa loja de eletrônicos. Sabia de tudo de memória. Produto, estoque, fornecedor, cliente. Quando fui embora, a loja foi junto."
+                </blockquote>
+                <div class="fundador-body">
+                    <p class="sb d2">A Aiza nasceu para que nenhum negócio dependa da memória de uma pessoa.</p>
+                    <p class="sb d3">
+                        O nome vem dos meus filhos —
+                        <strong>Aisha</strong>, que significa aquela que vive e prospera,
+                        e <strong>Zayn</strong>, beleza e graça.
+                        Num evento de avivamento Deus me deu clareza para começar.
+                        E assim nasceu a Aiza.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CTA FINAL ──────────────────────────────────────────── -->
+    <section class="section-cta" id="cta">
+        <div class="cta-glow-bg"></div>
+        <div class="wrap" style="position: relative; z-index: 1;">
+            <span class="eyebrow sb">Começa agora</span>
+            <h2 class="sb d1">
+                <span class="deg">Sua empresa finalmente<br>pode funcionar com clareza.</span>
+            </h2>
+            <p class="cta-trial sb d2">14 dias grátis. Sem cartão. Sem contrato.</p>
+            <p class="cta-guarantee sb d3">Se em 14 dias você não sentir a diferença — não paga nada.</p>
+
+            <div class="sb d4">
+                <div class="price-callout">
+                    <div>
+                        <div class="price-main">R$ 97</div>
+                        <div class="price-sub">por mês após o trial</div>
+                    </div>
+                    <div class="price-divider"></div>
+                    <div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--t); margin-bottom: 2px;">14 dias grátis</div>
+                        <div class="price-sub">sem cartão de crédito</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sb d5">
+                <a href="https://aizaai.com.br" class="btn-hero" style="font-size: 16px; padding: 16px 36px;">
+                    Começar agora
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M3.5 9h11M9.5 4.5l4.5 4.5-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="cta-trust sb">
+                <span class="trust-item">
+                    <span class="trust-check">
+                        <svg viewBox="0 0 8 8" fill="none">
+                            <path d="M1 4l2.5 2.5L7 1.5" stroke="#0047ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    Sem cartão de crédito
+                </span>
+                <span class="trust-item">
+                    <span class="trust-check">
+                        <svg viewBox="0 0 8 8" fill="none">
+                            <path d="M1 4l2.5 2.5L7 1.5" stroke="#0047ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    Cancele quando quiser
+                </span>
+                <span class="trust-item">
+                    <span class="trust-check">
+                        <svg viewBox="0 0 8 8" fill="none">
+                            <path d="M1 4l2.5 2.5L7 1.5" stroke="#0047ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    Suporte em português
+                </span>
+                <span class="trust-item">
+                    <span class="trust-check">
+                        <svg viewBox="0 0 8 8" fill="none">
+                            <path d="M1 4l2.5 2.5L7 1.5" stroke="#0047ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    Configuração em minutos
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────────── -->
+    <footer>
+        <div class="footer-logo">aiza<span>.</span></div>
+        <ul class="footer-links">
+            <li><a href="#">Privacidade</a></li>
+            <li><a href="#">Termos</a></li>
+            <li><a href="https://instagram.com/useaizaai" target="_blank">@useaizaai</a></li>
+            <li><a href="mailto:contato@aizaai.com.br">Contato</a></li>
+        </ul>
+        <p class="footer-right">© 2025 Aiza AI &middot; aizaai.com.br</p>
+    </footer>
+
+    <script>
+        /* ── Custom Cursor ──────────────────────────────────── */
+        const cI = document.getElementById('cI');
+        const cO = document.getElementById('cO');
+
+        let mx = -100, my = -100;
+        let ix = -100, iy = -100;
+        let ox = -100, oy = -100;
+        let cursorVisible = false;
+
+        document.addEventListener('mousemove', (e) => {
+            mx = e.clientX;
+            my = e.clientY;
+            if (!cursorVisible) {
+                cursorVisible = true;
+                cI.style.opacity = '1';
+                cO.style.opacity = '1';
+            }
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cI.style.opacity = '0';
+            cO.style.opacity = '0';
+        });
+
+        document.addEventListener('mouseenter', () => {
+            cI.style.opacity = '1';
+            cO.style.opacity = '1';
+        });
+
+        function lerp(a, b, t) { return a + (b - a) * t; }
+
+        function tickCursor() {
+            ix = lerp(ix, mx, 0.28);
+            iy = lerp(iy, my, 0.28);
+            ox = lerp(ox, mx, 0.11);
+            oy = lerp(oy, my, 0.11);
+
+            cI.style.left = ix + 'px';
+            cI.style.top  = iy + 'px';
+            cO.style.left = ox + 'px';
+            cO.style.top  = oy + 'px';
+
+            requestAnimationFrame(tickCursor);
+        }
+
+        tickCursor();
+
+        /* Cursor scale on hover */
+        document.querySelectorAll('a, button, .fx, .jc').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cO.style.transform = 'translate(-50%, -50%) scale(1.6)';
+                cO.style.borderColor = 'rgba(0, 71, 255, 0.85)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cO.style.transform = 'translate(-50%, -50%) scale(1)';
+                cO.style.borderColor = 'rgba(0, 71, 255, 0.55)';
+            });
+        });
+
+        /* ── Scroll Reveal ──────────────────────────────────── */
+        const revealObs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('on');
+                    revealObs.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.08,
+            rootMargin: '0px 0px -48px 0px'
+        });
+
+        document.querySelectorAll('.sb').forEach(el => revealObs.observe(el));
+
+        /* ── Nav border on scroll ───────────────────────────── */
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            nav.style.borderBottomColor = window.scrollY > 40
+                ? 'rgba(255,255,255,0.09)'
+                : 'rgba(255,255,255,0.05)';
+        }, { passive: true });
+
+        /* ── Announcement bar collapse ──────────────────────── */
+        const ann = document.querySelector('.announcement');
+        let lastScrollY = 0;
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 80 && window.scrollY > lastScrollY) {
+                ann.style.maxHeight = '0';
+                ann.style.paddingTop = '0';
+                ann.style.paddingBottom = '0';
+                ann.style.overflow = 'hidden';
+                ann.style.transition = 'max-height 0.4s ease, padding 0.4s ease';
+            }
+            lastScrollY = window.scrollY;
+        }, { passive: true });
+    </script>
+</body>
+</html>
