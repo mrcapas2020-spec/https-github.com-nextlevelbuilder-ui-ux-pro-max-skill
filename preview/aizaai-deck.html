@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIZA AI — Apresentação</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#06060a;
+  --p:#8b5cf6;
+  --pb:#a78bfa;
+  --pd:#6d28d9;
+  --pg:rgba(139,92,246,.28);
+  --pg2:rgba(139,92,246,.1);
+  --pg3:rgba(139,92,246,.04);
+  --w:rgba(255,255,255,1);
+  --w8:rgba(255,255,255,.8);
+  --w5:rgba(255,255,255,.5);
+  --w3:rgba(255,255,255,.3);
+  --w1:rgba(255,255,255,.1);
+  --w05:rgba(255,255,255,.05);
+  --w03:rgba(255,255,255,.03);
+  --bd:rgba(255,255,255,.07);
+  --bd2:rgba(255,255,255,.13);
+}
+
+html,body{width:100%;height:100%;background:var(--bg);overflow:hidden;font-family:'Inter',sans-serif;}
+
+/* ── Deck & Slide ─────────────────────────────────── */
+.deck{
+  position:relative;
+  width:100vw;height:100vh;
+  overflow:hidden;
+}
+@media(min-width:769px){
+  .deck{
+    max-width:calc(100vh*16/9);
+    max-height:calc(100vw*9/16);
+    margin:auto;
+    position:absolute;
+    inset:0;
+  }
+}
+
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:60px;
+  opacity:0;visibility:hidden;
+  transition:opacity .5s ease;
+  overflow:hidden;
+  background:var(--bg);
+}
+.slide.active{opacity:1;visibility:visible;}
+
+/* ── Entry animations ─────────────────────────────── */
+.slide .a{
+  opacity:0;
+  transform:translateY(30px);
+}
+.slide.active .a{
+  opacity:1;transform:translateY(0);
+  transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);
+  transition-delay:var(--d,0s);
+}
+.slide .a.fade{transform:none;}
+.slide.active .a.fade{transform:none;}
+
+.d0{--d:.0s}.d1{--d:.1s}.d2{--d:.2s}.d3{--d:.35s}
+.d4{--d:.5s}.d5{--d:.65s}.d6{--d:.8s}.d7{--d:.95s}.d8{--d:1.1s}
+
+/* ── Noise texture ────────────────────────────────── */
+.noise::before{
+  content:"";position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.35;pointer-events:none;z-index:0;
+}
+
+/* ── Typography ───────────────────────────────────── */
+.eyebrow{
+  font-size:11px;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--p);
+}
+.hero-title{
+  font-size:clamp(52px,7.5vw,104px);
+  font-weight:900;line-height:1.0;letter-spacing:-.05em;
+  color:#fff;
+}
+.section-title{
+  font-size:clamp(32px,4.5vw,60px);
+  font-weight:800;line-height:1.05;letter-spacing:-.04em;
+  color:#fff;
+}
+.body{
+  font-size:clamp(14px,1.4vw,18px);
+  line-height:1.75;color:var(--w5);font-weight:400;
+}
+.body strong{color:var(--w8);font-weight:600;}
+
+/* Glow text */
+.glow-text{
+  background:linear-gradient(135deg,#c4b5fd 0%,#8b5cf6 40%,#a78bfa 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-shadow:none;
+  filter:drop-shadow(0 0 32px rgba(139,92,246,.6));
+}
+.white-grad{
+  background:radial-gradient(140% 160% at 50% 10%,#ffffff 0%,#a8a8c8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* ── Glassmorphism card ───────────────────────────── */
+.glass{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--bd);
+  border-radius:16px;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+/* ── Glow orb helper ──────────────────────────────── */
+.orb{
+  border-radius:50%;
+  background:radial-gradient(circle,var(--p) 0%,var(--pd) 45%,transparent 70%);
+  filter:blur(2px);
+  pointer-events:none;
+}
+
+/* ── Nav ──────────────────────────────────────────── */
+.progress{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--pd),var(--pb));
+  transition:width .4s cubic-bezier(.16,1,.3,1);
+  z-index:900;
+}
+.nav{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%);
+  display:flex;align-items:center;gap:20px;
+  z-index:900;
+}
+.nbtn{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.07);border:1px solid var(--bd2);
+  color:#fff;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s,transform .15s;
+}
+.nbtn:hover{background:rgba(255,255,255,.14);transform:scale(1.05);}
+.nctr{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--w5);}
+.ndots{display:flex;gap:7px;align-items:center;}
+.ndot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--w3);transition:background .3s,transform .3s;cursor:pointer;
+}
+.ndot.on{background:var(--p);transform:scale(1.3);}
+
+/* ── Print ────────────────────────────────────────── */
+@media print{
+  .nav,.progress{display:none!important;}
+  .deck{position:static;max-width:100%;max-height:100%;}
+  .slide{
+    position:relative;opacity:1!important;visibility:visible!important;
+    page-break-after:always;break-after:page;
+    width:100%;height:100vh;
+  }
+  .slide .a{opacity:1!important;transform:none!important;}
+}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 1 — CAPA
+═══════════════════════════════════════════════════ */
+#s1{text-align:center;gap:0;}
+
+.s1-glow{
+  position:absolute;top:50%;left:50%;
+  width:680px;height:680px;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(109,40,217,.5) 0%,rgba(139,92,246,.15) 40%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+.s1-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:72px 72px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);
+  z-index:0;pointer-events:none;
+}
+.s1-particles{position:absolute;inset:0;z-index:0;pointer-events:none;}
+.s1-particles span{
+  position:absolute;border-radius:50%;
+  background:rgba(167,139,250,.7);
+}
+
+#s1 > *{position:relative;z-index:1;}
+
+.s1-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 14px 5px 8px;
+  border-radius:100px;
+  border:1px solid rgba(139,92,246,.3);
+  background:rgba(109,40,217,.12);
+  font-size:11px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(196,181,253,.9);
+  margin-bottom:36px;
+}
+.s1-bdot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--p);
+  animation:blink 2s ease-in-out infinite;
+}
+@keyframes blink{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:.4;transform:scale(.75);}
+}
+
+.s1-title{
+  font-size:clamp(64px,10vw,136px);
+  font-weight:900;letter-spacing:-.06em;line-height:.95;
+  margin-bottom:8px;
+}
+.s1-ai{
+  font-size:clamp(14px,1.8vw,22px);
+  font-weight:300;letter-spacing:.35em;
+  color:rgba(196,181,253,.6);
+  text-transform:uppercase;
+  margin-bottom:40px;
+}
+.s1-line{
+  width:1px;height:52px;
+  background:linear-gradient(to bottom,transparent,rgba(139,92,246,.5),transparent);
+  margin:0 auto 40px;
+}
+.s1-sub{
+  font-size:clamp(16px,2vw,24px);font-weight:300;
+  color:var(--w5);letter-spacing:.01em;
+  max-width:600px;
+}
+.s1-url{
+  margin-top:40px;
+  font-size:12px;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(139,92,246,.5);
+}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 2 — CAOS
+═══════════════════════════════════════════════════ */
+#s2{flex-direction:row;gap:0;text-align:left;padding:60px 80px;}
+
+.s2-left{
+  flex:0 0 44%;display:flex;flex-direction:column;
+  justify-content:center;gap:24px;
+  padding-right:40px;
+  position:relative;z-index:2;
+}
+.s2-right{
+  flex:1;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.chaos-item{
+  position:absolute;
+  border-radius:12px;
+  background:rgba(18,18,28,.95);
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  overflow:hidden;
+  transition:transform .3s;
+}
+
+/* WhatsApp */
+.ci-wa{
+  width:200px;top:5%;left:5%;
+  transform:rotate(-4deg);
+}
+.wa-head{
+  background:#128C7E;padding:10px 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.wa-av{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.wa-name{font-size:11px;font-weight:700;color:#fff;}
+.wa-status{font-size:9px;color:rgba(255,255,255,.7);}
+.wa-body{padding:10px;}
+.wa-msg{
+  background:rgba(255,255,255,.06);
+  border-radius:8px 8px 8px 2px;
+  padding:7px 10px;margin-bottom:6px;
+  font-size:9.5px;line-height:1.5;color:rgba(255,255,255,.8);
+  max-width:90%;
+}
+.wa-msg.out{
+  background:rgba(37,211,102,.18);
+  margin-left:auto;border-radius:8px 2px 8px 8px;
+}
+
+/* Calendar */
+.ci-cal{
+  width:190px;top:8%;right:5%;
+  transform:rotate(5deg);
+}
+.cal-head{
+  background:rgba(139,92,246,.25);padding:8px 12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.cal-month{font-size:10px;font-weight:700;color:var(--pb);}
+.cal-body{padding:10px;}
+.cal-row{display:flex;gap:4px;margin-bottom:4px;}
+.cal-cell{
+  width:20px;height:20px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;color:var(--w5);
+}
+.cal-cell.ev{background:rgba(139,92,246,.3);color:#fff;font-weight:700;}
+.cal-cell.busy{background:rgba(239,68,68,.25);color:rgba(239,68,68,.9);}
+.cal-cell.today{border:1px solid var(--p);color:#fff;}
+
+/* Spreadsheet */
+.ci-sheet{
+  width:230px;bottom:10%;left:2%;
+  transform:rotate(3deg);
+}
+.sh-head{
+  background:rgba(255,255,255,.06);padding:7px 10px;
+  display:flex;gap:12px;
+}
+.sh-tab{font-size:9px;color:var(--w3);}
+.sh-tab.active{color:#fff;border-bottom:1px solid var(--p);}
+.sh-body{padding:8px;}
+.sh-row{display:flex;gap:4px;margin-bottom:3px;}
+.sh-cell{
+  flex:1;height:18px;border-radius:2px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;padding:0 4px;
+  font-size:8px;color:var(--w3);
+}
+.sh-cell.err{color:rgba(239,68,68,.8);background:rgba(239,68,68,.06);}
+.sh-cell.hd{background:rgba(255,255,255,.07);color:var(--w5);}
+
+/* Task list */
+.ci-task{
+  width:175px;bottom:12%;right:2%;
+  transform:rotate(-3deg);
+}
+.task-head{
+  padding:10px 12px;background:rgba(245,158,11,.12);
+  font-size:10px;font-weight:700;color:rgba(245,158,11,.9);
+}
+.task-body{padding:8px 12px;}
+.task-row{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);
+}
+.task-row:last-child{border-bottom:none;}
+.task-cb{
+  width:13px;height:13px;border-radius:3px;
+  border:1.5px solid rgba(255,255,255,.2);flex-shrink:0;
+}
+.task-cb.done{
+  background:var(--p);border-color:var(--p);
+  display:flex;align-items:center;justify-content:center;
+}
+.task-lbl{font-size:9px;color:var(--w5);}
+.task-lbl.done{text-decoration:line-through;color:var(--w3);}
+
+/* Notification */
+.ci-notif{
+  width:180px;top:42%;left:28%;
+  transform:rotate(1deg);
+}
+.notif-body{
+  padding:12px;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.notif-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(239,68,68,.2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.notif-text .nt{font-size:10px;font-weight:700;color:#fff;margin-bottom:3px;}
+.notif-text .ns{font-size:9px;color:var(--w3);line-height:1.4;}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 3 — SOLUÇÃO
+═══════════════════════════════════════════════════ */
+#s3{gap:48px;}
+
+.s3-glow{
+  position:absolute;top:50%;left:50%;
+  width:640px;height:640px;
+  transform:translate(-50%,-48%);
+  background:radial-gradient(circle,rgba(109,40,217,.5) 0%,rgba(139,92,246,.18) 38%,transparent 68%);
+  pointer-events:none;
+}
+
+.orbit-system{
+  position:relative;
+  width:440px;height:440px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.orbit-ring{
+  position:absolute;border-radius:50%;
+  border:1px solid rgba(139,92,246,.18);
+}
+.ring1{width:180px;height:180px;}
+.ring2{width:320px;height:320px;animation:spin 30s linear infinite;}
+.ring3{width:430px;height:430px;border-style:dashed;border-color:rgba(139,92,246,.08);}
+
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+.orbit-center{
+  width:90px;height:90px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pd),var(--p));
+  box-shadow:0 0 60px rgba(139,92,246,.7),0 0 120px rgba(109,40,217,.3);
+  display:flex;align-items:center;justify-content:center;
+  z-index:2;
+  position:relative;
+  animation:breathe 3s ease-in-out infinite;
+}
+@keyframes breathe{
+  0%,100%{box-shadow:0 0 50px rgba(139,92,246,.6),0 0 100px rgba(109,40,217,.25);}
+  50%{box-shadow:0 0 80px rgba(139,92,246,.9),0 0 160px rgba(109,40,217,.45);}
+}
+
+.orbit-center-text{
+  font-size:10px;font-weight:800;letter-spacing:.1em;
+  color:#fff;text-align:center;
+}
+
+.sat{
+  position:absolute;z-index:3;
+}
+/* 6 satellites at 0°,60°,120°,180°,240°,300° on radius 200px */
+.sat1{top:calc(50% - 200px - 14px);left:calc(50% - 56px);}
+.sat2{top:calc(50% - 100px - 14px);left:calc(50% + 148px);}
+.sat3{top:calc(50% + 100px - 14px);left:calc(50% + 148px);}
+.sat4{top:calc(50% + 200px - 14px);left:calc(50% - 56px);}
+.sat5{top:calc(50% + 100px - 14px);left:calc(50% - 204px);}
+.sat6{top:calc(50% - 100px - 14px);left:calc(50% - 204px);}
+
+.sat-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:100px;
+  background:rgba(139,92,246,.12);
+  border:1px solid rgba(139,92,246,.25);
+  white-space:nowrap;
+  font-size:11px;font-weight:600;color:rgba(196,181,253,.9);
+}
+.sat-dot{width:5px;height:5px;border-radius:50%;background:var(--p);flex-shrink:0;}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 4 — SOFIA AI
+═══════════════════════════════════════════════════ */
+#s4{flex-direction:row;gap:0;padding:50px 70px;text-align:left;}
+
+.s4-left{
+  flex:0 0 42%;display:flex;flex-direction:column;
+  justify-content:center;gap:28px;
+  padding-right:48px;
+}
+.s4-right{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  gap:32px;
+}
+
+/* Phone mock */
+.phone-wrap{
+  width:200px;flex-shrink:0;
+  border-radius:28px;
+  background:#1a1a2e;
+  border:1.5px solid rgba(255,255,255,.12);
+  box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 8px rgba(255,255,255,.02);
+  overflow:hidden;
+}
+.phone-head{
+  background:linear-gradient(135deg,#075e54,#128c7e);
+  padding:14px 14px 10px;
+  display:flex;align-items:center;gap:10px;
+}
+.phone-av{
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.phone-name{font-size:12px;font-weight:700;color:#fff;}
+.phone-status{
+  font-size:10px;color:rgba(255,255,255,.75);
+  display:flex;align-items:center;gap:4px;
+}
+.online-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;}
+
+.chat-area{padding:12px 10px;display:flex;flex-direction:column;gap:7px;}
+.bubble{
+  max-width:80%;padding:8px 12px;
+  font-size:10px;line-height:1.55;
+  border-radius:12px;
+}
+.bubble.in{
+  background:rgba(255,255,255,.07);
+  border-radius:3px 12px 12px 12px;color:var(--w8);
+  align-self:flex-start;
+}
+.bubble.out{
+  background:rgba(37,211,102,.15);
+  border-radius:12px 3px 12px 12px;
+  color:rgba(200,255,215,.9);align-self:flex-end;
+  border:1px solid rgba(37,211,102,.2);
+}
+.btime{font-size:8px;color:var(--w3);margin-top:2px;text-align:right;}
+
+/* Flow steps */
+.flow-steps{
+  display:flex;flex-direction:column;
+  gap:0;
+}
+.flow-step{
+  display:flex;align-items:flex-start;gap:14px;
+  position:relative;
+}
+.flow-step:not(:last-child)::after{
+  content:"";
+  position:absolute;
+  left:15px;top:32px;
+  width:1px;height:32px;
+  background:linear-gradient(to bottom,rgba(139,92,246,.4),rgba(139,92,246,.1));
+}
+.fs-num{
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--p);
+  flex-shrink:0;
+}
+.fs-num.hl{
+  background:rgba(139,92,246,.35);
+  box-shadow:0 0 16px rgba(139,92,246,.4);
+  color:#fff;
+}
+.fs-content{padding:4px 0 36px;}
+.fs-title{font-size:13px;font-weight:700;color:#fff;}
+.fs-sub{font-size:11px;color:var(--w3);margin-top:2px;}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 5 — CONSULTÓRIO
+═══════════════════════════════════════════════════ */
+#s5{gap:40px;padding:50px 60px;}
+
+.clinic-ui{
+  width:100%;max-width:960px;
+  height:380px;
+  border-radius:16px;
+  border:1px solid var(--bd);
+  overflow:hidden;
+  display:flex;
+  box-shadow:0 40px 80px rgba(0,0,0,.5);
+  background:#08080f;
+}
+
+/* Sidebar */
+.cu-sidebar{
+  width:200px;flex-shrink:0;
+  border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;
+}
+.cu-sb-head{
+  padding:16px 14px 12px;
+  border-bottom:1px solid var(--bd);
+  font-size:11px;font-weight:700;color:var(--w5);
+  letter-spacing:.08em;text-transform:uppercase;
+}
+.patient-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.03);
+  cursor:pointer;transition:background .15s;
+}
+.patient-row:hover,.patient-row.active{background:rgba(139,92,246,.08);}
+.p-av{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;
+}
+.p-name{font-size:11px;font-weight:600;color:#fff;margin-bottom:1px;}
+.p-sub{font-size:9px;color:var(--w3);}
+.p-badge{
+  margin-left:auto;padding:2px 6px;border-radius:4px;
+  font-size:8px;font-weight:700;letter-spacing:.04em;
+}
+.badge-ok{background:rgba(74,222,128,.15);color:rgba(74,222,128,.9);}
+.badge-w{background:rgba(245,158,11,.15);color:rgba(245,158,11,.9);}
+.badge-new{background:rgba(139,92,246,.2);color:var(--pb);}
+
+/* Calendar/main */
+.cu-main{
+  flex:1;border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;
+}
+.cu-main-head{
+  padding:14px 16px;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.cu-title{font-size:13px;font-weight:700;color:#fff;}
+.cu-date{font-size:11px;color:var(--w3);}
+.cal-grid{padding:14px 16px;flex:1;}
+.cal-hours{display:flex;flex-direction:column;gap:6px;}
+.cal-slot{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 8px;border-radius:8px;
+  border:1px solid transparent;
+}
+.cal-slot.booked{
+  background:rgba(139,92,246,.1);
+  border-color:rgba(139,92,246,.2);
+}
+.cal-slot.free{opacity:.35;}
+.slot-time{
+  font-size:10px;font-weight:600;color:var(--w3);
+  width:36px;flex-shrink:0;
+}
+.slot-bar{
+  flex:1;height:28px;border-radius:6px;
+  display:flex;align-items:center;padding:0 10px;
+  font-size:10px;font-weight:600;
+}
+.slot-bar.purple{background:rgba(139,92,246,.25);color:var(--pb);}
+.slot-bar.teal{background:rgba(20,184,166,.2);color:rgba(94,234,212,.9);}
+.slot-bar.empty{background:rgba(255,255,255,.04);color:var(--w3);}
+.slot-dot{
+  width:6px;height:6px;border-radius:50%;margin-left:auto;flex-shrink:0;
+}
+
+/* Right panel — prontuário */
+.cu-right{
+  width:220px;flex-shrink:0;
+  display:flex;flex-direction:column;
+}
+.cu-right-head{
+  padding:14px 14px 12px;border-bottom:1px solid var(--bd);
+  font-size:11px;font-weight:700;color:var(--w5);
+  letter-spacing:.08em;text-transform:uppercase;
+}
+.pront-body{padding:14px;}
+.pront-av-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  margin-bottom:14px;gap:6px;
+}
+.pront-av{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pd),var(--p));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;
+  box-shadow:0 0 20px rgba(139,92,246,.4);
+}
+.pront-name{font-size:12px;font-weight:700;color:#fff;}
+.pront-tag{
+  font-size:9px;padding:2px 8px;border-radius:4px;
+  background:rgba(139,92,246,.2);color:var(--pb);font-weight:600;
+}
+.pront-field{
+  padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);
+}
+.pront-field:last-child{border-bottom:none;}
+.pf-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--w3);margin-bottom:3px;}
+.pf-val{font-size:11px;color:var(--w8);}
+.pf-ai{
+  margin-top:10px;padding:8px 10px;border-radius:8px;
+  background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);
+}
+.pf-ai-label{
+  font-size:9px;font-weight:700;color:var(--p);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;
+}
+.pf-ai-text{font-size:10px;color:rgba(196,181,253,.8);line-height:1.5;}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 6 — IA OPERACIONAL
+═══════════════════════════════════════════════════ */
+#s6{gap:48px;padding:50px 70px;}
+
+.ops-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  width:100%;max-width:900px;
+}
+.ops-card{
+  border-radius:14px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--bd);
+  padding:24px 24px 22px;
+  transition:border-color .3s,background .3s;
+  position:relative;overflow:hidden;
+  cursor:default;
+}
+.ops-card::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(139,92,246,.08),transparent);
+  opacity:0;transition:opacity .4s;
+}
+.ops-card:nth-child(1){border-color:rgba(139,92,246,.2);background:rgba(139,92,246,.06);}
+.ops-card:nth-child(1)::before{opacity:1;}
+.ops-card:nth-child(2):hover,
+.ops-card:nth-child(3):hover,
+.ops-card:nth-child(4):hover,
+.ops-card:nth-child(5):hover,
+.ops-card:nth-child(6):hover{
+  border-color:rgba(139,92,246,.2);background:rgba(139,92,246,.04);
+}
+.ops-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:rgba(139,92,246,.15);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;
+}
+.ops-icon svg{width:20px;height:20px;}
+.ops-label{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;}
+.ops-desc{font-size:12px;color:var(--w3);line-height:1.5;}
+.ops-badge{
+  margin-top:12px;display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;color:rgba(74,222,128,.8);
+  background:rgba(74,222,128,.1);padding:3px 8px;border-radius:4px;
+}
+.ops-badge-dot{width:5px;height:5px;border-radius:50%;background:rgba(74,222,128,.8);}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 7 — EXPERIÊNCIA
+═══════════════════════════════════════════════════ */
+#s7{gap:60px;text-align:center;}
+
+.exp-pillars{
+  display:flex;
+  gap:0;
+  width:100%;max-width:860px;
+}
+.exp-pill{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;padding:40px 32px;
+  border-right:1px solid var(--bd);
+  position:relative;
+}
+.exp-pill:last-child{border-right:none;}
+.exp-num{
+  font-size:11px;font-weight:700;
+  letter-spacing:.18em;color:rgba(139,92,246,.5);
+  margin-bottom:20px;text-transform:uppercase;
+}
+.exp-big{
+  font-size:clamp(40px,5vw,64px);
+  font-weight:900;letter-spacing:-.04em;
+  color:#fff;margin-bottom:14px;
+  line-height:1;
+}
+.exp-line{
+  width:28px;height:2px;
+  background:linear-gradient(90deg,var(--pd),var(--p));
+  margin-bottom:14px;
+  border-radius:1px;
+}
+.exp-desc{
+  font-size:14px;line-height:1.7;color:var(--w3);
+  max-width:180px;
+}
+.exp-pulse{
+  position:absolute;bottom:20px;right:20px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--p);
+  animation:blink 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 8 — FINAL
+═══════════════════════════════════════════════════ */
+#s8{text-align:center;gap:0;}
+
+.s8-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 50%,rgba(109,40,217,.55) 0%,rgba(139,92,246,.15) 45%,transparent 70%),
+    radial-gradient(ellipse 100% 80% at 50% 80%,rgba(76,29,149,.35) 0%,transparent 60%);
+  pointer-events:none;
+}
+.s8-lines{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);
+  background-size:80px 80px;
+  pointer-events:none;
+  mask-image:radial-gradient(ellipse 100% 100% at 50% 50%,black 40%,transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse 100% 100% at 50% 50%,black 40%,transparent 80%);
+}
+
+#s8>*{position:relative;z-index:1;}
+
+.s8-tagline{
+  font-size:12px;font-weight:700;letter-spacing:.22em;
+  text-transform:uppercase;color:rgba(196,181,253,.5);
+  margin-bottom:32px;
+}
+.s8-logo{
+  font-size:clamp(72px,12vw,160px);
+  font-weight:900;letter-spacing:-.06em;
+  line-height:.9;
+  margin-bottom:16px;
+}
+.s8-sub{
+  font-size:clamp(15px,1.8vw,22px);
+  font-weight:300;color:var(--w5);
+  letter-spacing:.01em;margin-bottom:52px;
+}
+.s8-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 36px;border-radius:100px;
+  background:var(--p);color:#fff;
+  font-size:15px;font-weight:700;letter-spacing:.01em;
+  text-decoration:none;border:none;cursor:pointer;
+  box-shadow:0 0 40px rgba(139,92,246,.45),0 0 80px rgba(109,40,217,.25),inset 0 0 12px rgba(255,255,255,.1);
+  animation:ctaPulse 3s ease-in-out infinite;
+  transition:transform .2s;
+}
+.s8-cta:hover{transform:scale(1.03);}
+@keyframes ctaPulse{
+  0%,100%{box-shadow:0 0 40px rgba(139,92,246,.45),0 0 80px rgba(109,40,217,.2),inset 0 0 12px rgba(255,255,255,.1);}
+  50%{box-shadow:0 0 60px rgba(139,92,246,.65),0 0 120px rgba(109,40,217,.35),inset 0 0 16px rgba(255,255,255,.15);}
+}
+.s8-cta-arrow{font-size:18px;transition:transform .2s;}
+.s8-cta:hover .s8-cta-arrow{transform:translateX(3px);}
+.s8-meta{
+  margin-top:36px;display:flex;align-items:center;
+  justify-content:center;gap:28px;flex-wrap:wrap;
+}
+.s8-m{font-size:12px;color:rgba(139,92,246,.45);font-weight:600;
+  letter-spacing:.08em;}
+.s8-sep{width:3px;height:3px;border-radius:50%;background:rgba(139,92,246,.25);}
+
+/* ─────────────────────────────────────────────────── */
+</style>
+</head>
+<body>
+
+<div class="progress" id="prog"></div>
+
+<div class="deck">
+
+<!-- ══════════════════════════════════════
+     SLIDE 1 — CAPA
+══════════════════════════════════════ -->
+<div class="slide noise" id="s1">
+  <div class="s1-glow"></div>
+  <div class="s1-grid"></div>
+  <div class="s1-particles" id="particles"></div>
+
+  <div class="s1-badge a d1">
+    <span class="s1-bdot"></span>
+    Inteligência Operacional para Negócios
+  </div>
+
+  <h1 class="s1-title glow-text a d2">AIZA AI</h1>
+  <p class="s1-ai a d3">Artificial Intelligence · Operational System</p>
+
+  <div class="s1-line a d4"></div>
+
+  <p class="s1-sub a d5">A IA operacional para negócios modernos.</p>
+  <p class="s1-url a d6">aizaai.com.br</p>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 2 — CAOS
+══════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="s2-left">
+    <span class="eyebrow a d0">O problema</span>
+    <h2 class="section-title a d1">Negócios modernos ainda<br><span class="glow-text">operam no caos.</span></h2>
+    <p class="body a d2">WhatsApp. Planilhas. Post-its. Lembretes. Cada ferramenta <strong>desconectada</strong>. Cada decisão, na memória de alguém.</p>
+    <p class="body a d3" style="font-size:13px;color:var(--w3);">Enquanto isso, clientes esperam. Estoque some. Dinheiro vai embora.</p>
+  </div>
+
+  <div class="s2-right a d2 fade">
+    <!-- WhatsApp mock -->
+    <div class="chaos-item ci-wa">
+      <div class="wa-head">
+        <div class="wa-av">C</div>
+        <div>
+          <div class="wa-name">Cliente — Marcos</div>
+          <div class="wa-status">visto às 14:32</div>
+        </div>
+      </div>
+      <div class="wa-body">
+        <div class="wa-msg">Oi, tem aquele produto em estoque?</div>
+        <div class="wa-msg out">Deixa eu verificar…</div>
+        <div class="wa-msg">Pode me passar o preço tbm?</div>
+        <div class="wa-msg out">Um segundo 🙏</div>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="chaos-item ci-cal">
+      <div class="cal-head">
+        <span class="cal-month">Maio 2025</span>
+        <span style="font-size:9px;color:rgba(239,68,68,.8);">3 conflitos</span>
+      </div>
+      <div class="cal-body">
+        <div class="cal-row">
+          <div class="cal-cell">S</div><div class="cal-cell">T</div><div class="cal-cell">Q</div>
+          <div class="cal-cell">Q</div><div class="cal-cell">S</div>
+        </div>
+        <div class="cal-row">
+          <div class="cal-cell">1</div><div class="cal-cell ev">2</div>
+          <div class="cal-cell busy">3</div><div class="cal-cell">4</div><div class="cal-cell today">5</div>
+        </div>
+        <div class="cal-row">
+          <div class="cal-cell busy">6</div><div class="cal-cell">7</div>
+          <div class="cal-cell ev">8</div><div class="cal-cell busy">9</div><div class="cal-cell">10</div>
+        </div>
+        <div class="cal-row">
+          <div class="cal-cell">11</div><div class="cal-cell">12</div>
+          <div class="cal-cell ev">13</div><div class="cal-cell">14</div><div class="cal-cell busy">15</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spreadsheet -->
+    <div class="chaos-item ci-sheet">
+      <div class="sh-head">
+        <span class="sh-tab active">Estoque.xlsx</span>
+        <span class="sh-tab">Financeiro</span>
+      </div>
+      <div class="sh-body">
+        <div class="sh-row">
+          <div class="sh-cell hd">Produto</div>
+          <div class="sh-cell hd">Qtd</div>
+          <div class="sh-cell hd">Valor</div>
+        </div>
+        <div class="sh-row">
+          <div class="sh-cell">Produto A</div>
+          <div class="sh-cell err">#N/A</div>
+          <div class="sh-cell">R$ 150</div>
+        </div>
+        <div class="sh-row">
+          <div class="sh-cell">Produto B</div>
+          <div class="sh-cell">3</div>
+          <div class="sh-cell err">#DIV/0!</div>
+        </div>
+        <div class="sh-row">
+          <div class="sh-cell">Produto C</div>
+          <div class="sh-cell err">-2</div>
+          <div class="sh-cell">???</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task list -->
+    <div class="chaos-item ci-task">
+      <div class="task-head">⚠ Pendências do dia</div>
+      <div class="task-body">
+        <div class="task-row">
+          <div class="task-cb done">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <span class="task-lbl done">Ligar fornecedor</span>
+        </div>
+        <div class="task-row">
+          <div class="task-cb"></div>
+          <span class="task-lbl">Enviar NF Marcos</span>
+        </div>
+        <div class="task-row">
+          <div class="task-cb"></div>
+          <span class="task-lbl">Conferir estoque</span>
+        </div>
+        <div class="task-row">
+          <div class="task-cb"></div>
+          <span class="task-lbl">Responder WhatsApp</span>
+        </div>
+        <div class="task-row">
+          <div class="task-cb"></div>
+          <span class="task-lbl">Relatório contador</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="chaos-item ci-notif">
+      <div class="notif-body">
+        <div class="notif-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 2l1.5 4.5H14L10.5 9l1.5 4.5L8 11 4 13.5 5.5 9 2 6.5h4.5L8 2z" fill="rgba(239,68,68,.8)"/>
+          </svg>
+        </div>
+        <div class="notif-text">
+          <div class="nt">Estoque crítico</div>
+          <div class="ns">Produto B está com 0 unidades. Última venda há 2h.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 3 — SOLUÇÃO
+══════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="s3-glow"></div>
+
+  <span class="eyebrow a d0">A solução</span>
+  <h2 class="section-title a d1" style="text-align:center;max-width:700px">
+    A operação <span class="glow-text">finalmente organizada.</span>
+  </h2>
+
+  <div class="orbit-system a d2 fade">
+    <div class="orbit-ring ring3"></div>
+    <div class="orbit-ring ring2"></div>
+    <div class="orbit-ring ring1"></div>
+
+    <div class="orbit-center">
+      <div class="orbit-center-text">AIZA<br>AI</div>
+    </div>
+
+    <div class="sat sat1 a d3"><span class="sat-pill"><span class="sat-dot"></span>Tarefas</span></div>
+    <div class="sat sat2 a d4"><span class="sat-pill"><span class="sat-dot"></span>Financeiro</span></div>
+    <div class="sat sat3 a d5"><span class="sat-pill"><span class="sat-dot"></span>Estoque</span></div>
+    <div class="sat sat4 a d6"><span class="sat-pill"><span class="sat-dot"></span>Agenda</span></div>
+    <div class="sat sat5 a d5"><span class="sat-pill"><span class="sat-dot"></span>WhatsApp</span></div>
+    <div class="sat sat6 a d4"><span class="sat-pill"><span class="sat-dot"></span>Relatórios</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 4 — SOFIA AI
+══════════════════════════════════════ -->
+<div class="slide" id="s4">
+
+  <div class="s4-left">
+    <span class="eyebrow a d0">Sofia AI</span>
+    <h2 class="section-title a d1">A recepcionista<br><span class="glow-text">mais inteligente</span><br>do mundo.</h2>
+    <p class="body a d2">Atende pacientes, agenda consultas e cria prontuários — tudo pelo WhatsApp, <strong>sem intervenção humana</strong>.</p>
+  </div>
+
+  <div class="s4-right">
+    <div class="phone-wrap a d2">
+      <div class="phone-head">
+        <div class="phone-av">S</div>
+        <div>
+          <div class="phone-name">Sofia AI</div>
+          <div class="phone-status">
+            <span class="online-dot"></span>
+            online agora
+          </div>
+        </div>
+      </div>
+      <div class="chat-area">
+        <div class="bubble in">Oi, queria marcar uma avaliação 😊<div class="btime">14:03</div></div>
+        <div class="bubble out">Olá! Tenho horários na terça 10h ou quinta 14h. Qual prefere?<div class="btime">14:03</div></div>
+        <div class="bubble in">Quinta 14h seria ótimo!<div class="btime">14:04</div></div>
+        <div class="bubble out">Perfeito! ✓ Agendado para quinta às 14h. Confirmação enviada.<div class="btime">14:04</div></div>
+      </div>
+    </div>
+
+    <div class="flow-steps a d3">
+      <div class="flow-step">
+        <div class="fs-num">1</div>
+        <div class="fs-content">
+          <div class="fs-title">Paciente envia mensagem</div>
+          <div class="fs-sub">WhatsApp</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num hl">2</div>
+        <div class="fs-content">
+          <div class="fs-title">Sofia entende e responde</div>
+          <div class="fs-sub">IA em tempo real</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">3</div>
+        <div class="fs-content">
+          <div class="fs-title">Agenda atualiza</div>
+          <div class="fs-sub">Automático</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">4</div>
+        <div class="fs-content">
+          <div class="fs-title">Paciente criado</div>
+          <div class="fs-sub">Prontuário salvo</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">5</div>
+        <div class="fs-content" style="padding-bottom:0">
+          <div class="fs-title">Confirmação enviada</div>
+          <div class="fs-sub">Zero esforço humano</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 5 — CONSULTÓRIO
+══════════════════════════════════════ -->
+<div class="slide" id="s5">
+
+  <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:32px;">
+    <span class="eyebrow a d0">Consultório Inteligente</span>
+    <h2 class="section-title a d1" style="text-align:center">
+      O futuro do atendimento <span class="glow-text">já começou.</span>
+    </h2>
+  </div>
+
+  <div class="clinic-ui a d2 fade">
+    <!-- Sidebar -->
+    <div class="cu-sidebar">
+      <div class="cu-sb-head">Pacientes</div>
+      <div class="patient-row active">
+        <div class="p-av" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)">A</div>
+        <div><div class="p-name">Ana Paula</div><div class="p-sub">Quinta 14h</div></div>
+        <span class="p-badge badge-ok">✓</span>
+      </div>
+      <div class="patient-row">
+        <div class="p-av" style="background:linear-gradient(135deg,#0891b2,#06b6d4)">M</div>
+        <div><div class="p-name">Marcos Silva</div><div class="p-sub">Quinta 15h</div></div>
+        <span class="p-badge badge-new">Novo</span>
+      </div>
+      <div class="patient-row">
+        <div class="p-av" style="background:linear-gradient(135deg,#059669,#10b981)">C</div>
+        <div><div class="p-name">Carla Souza</div><div class="p-sub">Sex 09h</div></div>
+        <span class="p-badge badge-w">↩</span>
+      </div>
+      <div class="patient-row">
+        <div class="p-av" style="background:linear-gradient(135deg,#b45309,#f59e0b)">R</div>
+        <div><div class="p-name">Roberto Dias</div><div class="p-sub">Sex 10h</div></div>
+        <span class="p-badge badge-ok">✓</span>
+      </div>
+      <div class="patient-row">
+        <div class="p-av" style="background:linear-gradient(135deg,#be185d,#ec4899)">J</div>
+        <div><div class="p-name">Julia Melo</div><div class="p-sub">Seg 11h</div></div>
+        <span class="p-badge badge-new">Novo</span>
+      </div>
+    </div>
+
+    <!-- Main calendar -->
+    <div class="cu-main">
+      <div class="cu-main-head">
+        <span class="cu-title">Agenda — Quinta-feira, 22</span>
+        <span class="cu-date">4 consultas hoje</span>
+      </div>
+      <div class="cal-grid">
+        <div class="cal-hours">
+          <div class="cal-slot">
+            <span class="slot-time">08:00</span>
+            <div class="slot-bar empty">Disponível</div>
+          </div>
+          <div class="cal-slot booked">
+            <span class="slot-time">09:00</span>
+            <div class="slot-bar teal">Retorno — Carla Souza
+              <span class="slot-dot" style="background:rgba(20,184,166,.8)"></span>
+            </div>
+          </div>
+          <div class="cal-slot">
+            <span class="slot-time">10:00</span>
+            <div class="slot-bar empty">Disponível</div>
+          </div>
+          <div class="cal-slot booked">
+            <span class="slot-time">14:00</span>
+            <div class="slot-bar purple">Avaliação — Ana Paula
+              <span class="slot-dot" style="background:var(--p)"></span>
+            </div>
+          </div>
+          <div class="cal-slot booked">
+            <span class="slot-time">15:00</span>
+            <div class="slot-bar purple">Consulta — Marcos Silva
+              <span class="slot-dot" style="background:var(--p)"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prontuário -->
+    <div class="cu-right">
+      <div class="cu-right-head">Prontuário</div>
+      <div class="pront-body">
+        <div class="pront-av-wrap">
+          <div class="pront-av">A</div>
+          <div class="pront-name">Ana Paula</div>
+          <span class="pront-tag">Avaliação</span>
+        </div>
+        <div class="pront-field">
+          <div class="pf-label">Idade</div>
+          <div class="pf-val">34 anos</div>
+        </div>
+        <div class="pront-field">
+          <div class="pf-label">Anamnese</div>
+          <div class="pf-val" style="font-size:10px;color:var(--w5)">Dor leve no quadrante superior. Sensibilidade ao frio. Relata bruxismo.</div>
+        </div>
+        <div class="pront-field">
+          <div class="pf-label">Proposta</div>
+          <div class="pf-val">R$ 2.400 — Protocolo A</div>
+        </div>
+        <div class="pf-ai">
+          <div class="pf-ai-label">✦ Sofia sugeriu</div>
+          <div class="pf-ai-text">Retorno em 30 dias. Placa de bruxismo recomendada.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 6 — IA OPERACIONAL
+══════════════════════════════════════ -->
+<div class="slide" id="s6">
+
+  <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:40px;">
+    <span class="eyebrow a d0">IA Operacional</span>
+    <h2 class="section-title a d1" style="text-align:center">
+      A IA que <span class="glow-text">pensa junto</span><br>com seu negócio.
+    </h2>
+  </div>
+
+  <div class="ops-grid">
+    <div class="ops-card a d2">
+      <div class="ops-icon">
+        <svg viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="5" width="16" height="3" rx="1.5" fill="rgba(167,139,250,.8)"/>
+          <rect x="2" y="10" width="12" height="3" rx="1.5" fill="rgba(167,139,250,.5)"/>
+          <rect x="2" y="15" width="8" height="3" rx="1.5" fill="rgba(167,139,250,.3)"/>
+        </svg>
+      </div>
+      <div class="ops-label">Tarefas Automáticas</div>
+      <div class="ops-desc">Cria e distribui tarefas com base nos eventos da operação.</div>
+      <div class="ops-badge"><span class="ops-badge-dot"></span>Ativo</div>
+    </div>
+
+    <div class="ops-card a d3">
+      <div class="ops-icon">
+        <svg viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="7" stroke="rgba(167,139,250,.7)" stroke-width="1.5"/>
+          <path d="M10 6v4l3 2" stroke="rgba(167,139,250,.9)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="ops-label">Alertas Inteligentes</div>
+      <div class="ops-desc">Identifica problemas antes que virem incêndios.</div>
+    </div>
+
+    <div class="ops-card a d4">
+      <div class="ops-icon">
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M3 14l4-5 3 3 3-4 4 4" stroke="rgba(167,139,250,.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="3" cy="14" r="1.5" fill="rgba(167,139,250,.6)"/>
+          <circle cx="17" cy="9" r="1.5" fill="rgba(167,139,250,.6)"/>
+        </svg>
+      </div>
+      <div class="ops-label">Financeiro</div>
+      <div class="ops-desc">Fluxo de caixa, contas e relatórios para o contador.</div>
+    </div>
+
+    <div class="ops-card a d3">
+      <div class="ops-icon">
+        <svg viewBox="0 0 20 20" fill="none">
+          <rect x="3" y="3" width="6" height="6" rx="1.5" fill="rgba(167,139,250,.5)"/>
+          <rect x="11" y="3" width="6" height="6" rx="1.5" fill="rgba(167,139,250,.7)"/>
+          <rect x="3" y="11" width="6" height="6" rx="1.5" fill="rgba(167,139,250,.4)"/>
+          <rect x="11" y="11" width="6" height="6" rx="1.5" fill="rgba(167,139,250,.8)"/>
+        </svg>
+      </div>
+      <div class="ops-label">Estoque</div>
+      <div class="ops-desc">Controle em tempo real. Alerta antes do produto acabar.</div>
+    </div>
+
+    <div class="ops-card a d4">
+      <div class="ops-icon">
+        <svg viewBox="0 0 20 20" fill="none">
+          <rect x="3" y="4" width="14" height="13" rx="2" stroke="rgba(167,139,250,.7)" stroke-width="1.5"/>
+          <path d="M3 8h14" stroke="rgba(167,139,250,.5)" stroke-width="1"/>
+          <circle cx="7" cy="12" r="1.5" fill="rgba(167,139,250,.6)"/>
+          <circle cx="13" cy="12" r="1.5" fill="rgba(167,139,250,.4)"/>
+          <path d="M7 4V2M13 4V2" stroke="rgba(167,139,250,.5)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="ops-label">Agenda</div>
+      <div class="ops-desc">Gerencia horários, compromissos e follow-ups.</div>
+    </div>
+
+    <div class="ops-card a d5">
+      <div class="ops-icon">
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M4 15l3-8 3 5 2-3 3 6" stroke="rgba(167,139,250,.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ops-label">Relatórios IA</div>
+      <div class="ops-desc">Seu contador recebe tudo pronto. Sem você enviar nada.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 7 — EXPERIÊNCIA
+══════════════════════════════════════ -->
+<div class="slide" id="s7">
+
+  <span class="eyebrow a d0">A experiência</span>
+  <h2 class="section-title a d1" style="text-align:center;margin-bottom:0">
+    Tecnologia avançada<br><span class="glow-text">sem complexidade.</span>
+  </h2>
+
+  <div class="exp-pillars a d2 fade">
+    <div class="exp-pill">
+      <div class="exp-num">01</div>
+      <div class="exp-big white-grad">Simples</div>
+      <div class="exp-line"></div>
+      <div class="exp-desc">Nenhum treinamento necessário. Você usa pelo WhatsApp como sempre fez.</div>
+      <div class="exp-pulse"></div>
+    </div>
+    <div class="exp-pill">
+      <div class="exp-num">02</div>
+      <div class="exp-big white-grad">Rápida</div>
+      <div class="exp-line"></div>
+      <div class="exp-desc">Respostas em segundos. Decisões em tempo real. Operação sem atrasos.</div>
+    </div>
+    <div class="exp-pill">
+      <div class="exp-num">03</div>
+      <div class="exp-big white-grad">Inteligente</div>
+      <div class="exp-line"></div>
+      <div class="exp-desc">Aprende com o seu negócio. Antecipa problemas. Pensa junto com você.</div>
+    </div>
+  </div>
+
+  <p class="a d4" style="font-size:13px;color:var(--w3);letter-spacing:.01em;text-align:center">
+    14 dias grátis · Sem cartão · R$ 97/mês
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 8 — FINAL
+══════════════════════════════════════ -->
+<div class="slide noise" id="s8">
+  <div class="s8-bg"></div>
+  <div class="s8-lines"></div>
+
+  <p class="s8-tagline a d0">A próxima geração da operação empresarial</p>
+
+  <h1 class="s8-logo glow-text a d1">AIZA AI</h1>
+
+  <p class="s8-sub a d2">A IA que organiza, antecipa e trabalha<br>enquanto você cuida do que importa.</p>
+
+  <a href="https://aizaai.com.br" class="s8-cta a d3">
+    Conheça a AIZA
+    <span class="s8-cta-arrow">→</span>
+  </a>
+
+  <div class="s8-meta a d4">
+    <span class="s8-m">14 dias grátis</span>
+    <span class="s8-sep"></span>
+    <span class="s8-m">Sem cartão</span>
+    <span class="s8-sep"></span>
+    <span class="s8-m">R$ 97/mês</span>
+    <span class="s8-sep"></span>
+    <span class="s8-m">aizaai.com.br</span>
+  </div>
+</div>
+
+</div><!-- /.deck -->
+
+<!-- Navigation -->
+<div class="nav">
+  <button class="nbtn" onclick="prev()">←</button>
+  <div class="ndots" id="dots"></div>
+  <button class="nbtn" onclick="next()">→</button>
+</div>
+
+<script>
+// ── Particles (Slide 1) ──────────────────────────────
+(function(){
+  const c=document.getElementById('particles');
+  const pts=[
+    {x:8,y:12,s:2,o:.5},{x:18,y:68,s:1.5,o:.4},{x:82,y:15,s:2.5,o:.6},
+    {x:91,y:72,s:1.5,o:.35},{x:5,y:45,s:1,o:.3},{x:95,y:40,s:2,o:.5},
+    {x:25,y:88,s:1,o:.4},{x:75,y:82,s:1.5,o:.45},{x:42,y:5,s:2,o:.55},
+    {x:60,y:92,s:1,o:.3},{x:12,y:30,s:1.5,o:.4},{x:88,y:28,s:2,o:.5},
+    {x:35,y:78,s:1,o:.35},{x:65,y:18,s:1.5,o:.45},{x:50,y:95,s:2,o:.4},
+    {x:20,y:55,s:1,o:.3},{x:80,y:55,s:2,o:.5},{x:55,y:48,s:1.5,o:.25},
+  ];
+  pts.forEach(p=>{
+    const el=document.createElement('span');
+    el.style.cssText=`left:${p.x}%;top:${p.y}%;width:${p.s}px;height:${p.s}px;opacity:${p.o};`;
+    c.appendChild(el);
+  });
+})();
+
+// ── Navigation ───────────────────────────────────────
+const slides=document.querySelectorAll('.slide');
+const total=slides.length;
+let cur=1;
+
+// Build dots
+const dotsEl=document.getElementById('dots');
+for(let i=1;i<=total;i++){
+  const d=document.createElement('div');
+  d.className='ndot';
+  d.onclick=()=>go(i);
+  dotsEl.appendChild(d);
+}
+
+function go(n){
+  if(n<1)n=1;if(n>total)n=total;
+
+  // Remove active from all (triggers transition reset)
+  slides.forEach(s=>s.classList.remove('active'));
+
+  // Force reflow so CSS transitions restart
+  void document.body.offsetWidth;
+
+  cur=n;
+  slides[cur-1].classList.add('active');
+
+  // Progress bar
+  document.getElementById('prog').style.width=(cur/total*100)+'%';
+
+  // Dots
+  document.querySelectorAll('.ndot').forEach((d,i)=>{
+    d.classList.toggle('on',i===cur-1);
+  });
+}
+
+function next(){go(cur+1);}
+function prev(){go(cur-1);}
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}
+  if(e.key==='ArrowLeft'){e.preventDefault();prev();}
+  if(e.key==='Escape'){go(1);}
+});
+
+// Click to advance (avoid nav area and interactive elements)
+document.querySelector('.deck').addEventListener('click',e=>{
+  if(!e.target.closest('a,button,.nbtn,.ndot')) next();
+});
+
+// Touch/swipe
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50){dx<0?next():prev();}
+},{passive:true});
+
+// Init
+go(1);
+</script>
+</body>
+</html>
